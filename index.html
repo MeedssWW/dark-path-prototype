@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dark Path Prototype</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <div>
+            <h1>Dark Path</h1>
+            <p>auto battle fantasy prototype</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="audioToggle" class="icon-button" type="button" title="Музыка">♪</button>
+          <button id="resetRun" class="ghost-button" type="button">Сброс</button>
+        </div>
+      </header>
+
+      <main class="game-layout">
+        <section class="stage-panel">
+          <div class="stage-sky">
+            <div class="moon"></div>
+            <div class="mist mist-a"></div>
+            <div class="mist mist-b"></div>
+            <div class="ruin ruin-left"></div>
+            <div class="ruin ruin-right"></div>
+            <div class="tree-line tree-line-left"></div>
+            <div class="tree-line tree-line-right"></div>
+            <div class="far-castle">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="path-card">
+            <div class="location-row">
+              <div>
+                <p class="label">Локация</p>
+                <h2 id="locationName">Черный Лес</h2>
+              </div>
+              <div class="sector-chip">
+                <span id="sectorNumber">1</span>
+                <small>сектор</small>
+              </div>
+            </div>
+
+            <div class="progress-line">
+              <div id="sectorProgressBar"></div>
+            </div>
+            <div class="encounter-row" id="encounterPips"></div>
+          </div>
+
+          <div class="battlefield first-person">
+            <div class="road-scene" id="roadScene">
+              <div class="road-scene-bg" id="roadSceneBg"></div>
+              <div class="road-lines"></div>
+              <div class="enemy-pack" id="enemyPack"></div>
+
+              <div class="enemy-stage" id="enemyStage">
+                <div class="enemy-nameplate">
+                  <strong id="enemyName">Враг</strong>
+                  <span id="enemyHpText">0 / 0</span>
+                </div>
+                <div class="hp-track enemy-track"><div id="enemyHpBar"></div></div>
+                <div class="enemy-traits" id="enemyTraits"></div>
+                <div class="portrait enemy-portrait" id="enemyPortrait">
+                  <span class="enemy-silhouette"></span>
+                </div>
+              </div>
+
+              <div class="clash-column">
+                <div id="combatStatus" class="combat-status">Путь начинается</div>
+                <div id="starCharge" class="star-charge"></div>
+              </div>
+
+              <div class="hero-hud" id="heroHudFloat">
+                <div>
+                  <strong>Герой</strong>
+                  <span id="heroHpText">0 / 0</span>
+                </div>
+                <div class="hp-track"><div id="heroHpBar"></div></div>
+              </div>
+
+              <div class="player-hands">
+                <div class="hand hand-left">
+                  <div class="talisman-orb" id="playerOffhand"></div>
+                </div>
+                <div class="hand hand-right"></div>
+                <div class="sword" id="playerWeapon">
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-panel hidden" id="eventPanel">
+            <div>
+              <p class="label" id="eventKind">Событие</p>
+              <h3 id="eventTitle">Событие</h3>
+              <p id="eventText"></p>
+            </div>
+            <div class="event-actions" id="eventActions"></div>
+          </div>
+
+          <div class="log-panel">
+            <div class="log-header">
+              <span>Боевой журнал</span>
+              <div class="log-controls">
+                <button id="speedToggle" class="ghost-button small speed-btn" type="button">1x</button>
+                <button id="pauseToggle" class="ghost-button small" type="button">Пауза</button>
+              </div>
+            </div>
+            <div id="battleLog" class="battle-log"></div>
+          </div>
+        </section>
+
+        <aside class="side-panel hero-panel">
+          <div class="panel-head">
+            <div>
+              <p class="label">Персонаж</p>
+              <h2>Характеристики</h2>
+            </div>
+            <div class="gold-pill"><span id="goldValue">0</span> G</div>
+          </div>
+
+          <p class="class-badge-line">Класс: <strong id="classBadge">—</strong></p>
+
+          <div class="level-row">
+            <div>
+              <span class="label">Улучшений</span>
+              <strong id="upgradeCount">0</strong>
+            </div>
+            <div>
+              <span class="label">Звезды</span>
+              <strong id="starCount">0</strong>
+            </div>
+          </div>
+
+          <div class="buff-section">
+            <span class="label">Баффы сектора</span>
+            <div id="buffBar" class="buff-bar"></div>
+          </div>
+
+          <div class="buff-section">
+            <span class="label">Синергии и сеты</span>
+            <div id="synergyBar" class="synergy-bar"></div>
+          </div>
+
+          <div id="statsGrid" class="stats-grid"></div>
+
+          <div class="upgrade-box">
+            <button id="upgradeHero" class="primary-button" type="button">Улучшить героя</button>
+            <p id="upgradeCost">Стоимость: 0 G</p>
+          </div>
+
+          <div class="boss-box">
+            <div class="souls">
+              <div>
+                <span>Рай (+HP, точность)</span>
+                <strong id="heavenSouls">0 / 5</strong>
+              </div>
+              <div>
+                <span>Ад (+урон, кровь)</span>
+                <strong id="hellSouls">0 / 5</strong>
+              </div>
+            </div>
+            <div class="boss-actions">
+              <button id="summonHeaven" type="button">Босс Рая</button>
+              <button id="summonHell" type="button">Босс Ада</button>
+            </div>
+          </div>
+        </aside>
+
+        <aside class="side-panel loot-panel">
+          <div class="panel-head">
+            <div>
+              <p class="label">Добыча</p>
+              <h2>Снаряжение</h2>
+            </div>
+            <div id="lootRarityBadge" class="rarity-badge">Обычный</div>
+          </div>
+
+          <div class="loot-card hidden" id="lootCard">
+            <div class="loot-top">
+              <div id="lootIcon" class="item-icon large"></div>
+              <div>
+                <span class="label">Новый предмет</span>
+                <h3 id="lootName">Предмет</h3>
+                <p id="lootStats"></p>
+              </div>
+            </div>
+            <div id="lootCompare" class="loot-compare"></div>
+            <div class="loot-actions">
+              <button id="equipLoot" class="primary-button" type="button">Надеть</button>
+              <button id="sellLoot" class="ghost-button" type="button">Продать</button>
+              <button id="rerollLoot" class="ghost-button" type="button">Перековать</button>
+            </div>
+            <p id="rerollCost" class="reroll-hint">Перековка: 0 G</p>
+          </div>
+
+          <div id="gearGrid" class="gear-grid"></div>
+
+          <div class="drop-panel">
+            <div class="drop-head">
+              <span>Шансы лута</span>
+              <small id="dropSectorText">Сектор 1</small>
+            </div>
+            <div id="dropChances" class="drop-chances"></div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div id="milestoneToast" class="milestone-toast" aria-live="polite">
+      <strong class="milestone-title"></strong>
+      <p class="milestone-text"></p>
+    </div>
+
+    <div id="classOverlay" class="game-overlay">
+      <div class="overlay-card wide">
+        <p class="label">Выбор пути</p>
+        <h2>Кто идёт по тёмной дороге?</h2>
+        <p class="overlay-desc">Класс влияет на стартовые статы и звёздную способность.</p>
+        <div id="classChoices" class="class-grid"></div>
+      </div>
+    </div>
+
+    <div id="tutorialOverlay" class="game-overlay hidden">
+      <div class="overlay-card">
+        <p class="label">Обучение <span id="tutorialProgress">1 / 4</span></p>
+        <h2 id="tutorialTitle"></h2>
+        <p id="tutorialText"></p>
+        <div class="overlay-actions">
+          <button id="tutorialSkip" class="ghost-button" type="button">Пропустить</button>
+          <button id="tutorialNext" class="primary-button" type="button">Далее</button>
+        </div>
+      </div>
+    </div>
+
+    <audio id="musicPlayer" loop preload="none">
+      <source src="./assets/hide-cs01-slowed.mp3" type="audio/mpeg" />
+    </audio>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
