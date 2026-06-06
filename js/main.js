@@ -161,8 +161,25 @@ function upgradeHero() {
 }
 
 function summonBoss(side) {
-  if (state[`${side}Souls`] < 5 || state.currentEnemy || state.awaitingEvent) return;
-  if (getAliveEnemies().length) return;
+  // Allow boss summoning anytime, require 5 souls
+  if (state[`${side}Souls`] < 5) return;
+  
+  // If already in combat, can't summon
+  if (state.currentEnemy && !state.currentEnemy.bossSide) return;
+  
+  // End current combat if any
+  if (state.currentEnemy) {
+    state.enemyGroup = [];
+    state.currentEnemy = null;
+  }
+  
+  // Clear any lingering alive enemies
+  state.enemyGroup = [];
+  
+  // Restore hero HP to max
+  const hero = getHeroStats();
+  state.heroHp = hero.maxHp;
+  
   addLog(state, side === "heaven" ? "Пять душ открыли врата Рая." : "Пять душ открыли врата Ада.");
   spawnEnemy(state, false, side);
   saveState();

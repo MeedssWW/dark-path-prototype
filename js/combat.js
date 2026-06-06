@@ -61,51 +61,79 @@ function applyArchetypeMods(enemy, archetypeKey, elite, bossSide) {
 
 export function spawnEnemy(s = state, elite = false, bossSide = null) {
   const location = locationForSector(s.sector);
-  const scaling = 1 + s.sector * 0.13;
-  const tierBoost = bossSide ? (bossSide === "heaven" ? s.heavenBossTier : s.hellBossTier) : 1;
+  // Limit enemy scaling to prevent exponential difficulty
+  const sectorCap = Math.min(s.sector, 50);
+  const scaling = 1 + sectorCap * 0.08;
   const count = bossSide ? 1 : rollEnemyCount(s.sector);
+  
+  // Boss stats are FIXED regardless of tier
+  let bossStats = null;
+  if (bossSide === "heaven") {
+    bossStats = { hp: 950, damage: 65, armor: 32, evasion: 0.18, accuracy: 0.85, healOnHit: 0.28 };
+  } else if (bossSide === "hell") {
+    bossStats = { hp: 1100, damage: 78, armor: 28, evasion: 0.12, accuracy: 0.92, bleedOnHit: 0.35 };
+  }
+  
   s.enemyGroup = Array.from({ length: count }, (_, index) => {
     const mob = pickMob(location);
     const name = bossSide
-      ? `${bossSide === "heaven" ? "Серафим Суда" : "Палач Бездны"} ${tierBoost}`
+      ? `${bossSide === "heaven" ? "Серафим Суда" : "Палач Бездны"}`
       : mob.name;
     const packPenalty = count > 1 ? 0.72 : 1;
-    const bossScale = bossSide ? 2.8 + tierBoost * 0.65 : 1;
-    const enemy = {
-      id: crypto.randomUUID(),
-      name: elite ? `Элитный ${name}` : count > 1 ? `${name} ${index + 1}` : name,
-      bossSide,
-      elite,
-      visual: "beast",
-      traits: [],
-      hp: Math.round(
-        (82 + s.sector * 18) * scaling * packPenalty * (elite ? 1.65 : 1) * bossScale
-      ),
-      maxHp: 0,
-      damage: Math.round(
-        (11 + s.sector * 2.75) * (count > 1 ? 0.78 : 1) * (elite ? 1.48 : 1) * (bossSide ? 1.95 + tierBoost * 0.28 : 1)
-      ),
-      armor: Math.round((3 + s.sector * 0.36) * (elite ? 1.24 : 1) * (bossSide ? 1.55 : 1)),
-      evasion: clamp((bossSide === "heaven" ? 0.12 : 0.04) + s.sector * 0.0019 + (elite ? 0.04 : 0), 0.03, bossSide === "heaven" ? 0.32 : 0.24),
-      accuracy: clamp((bossSide === "hell" ? 0.92 : 0.82) + Math.min(0.16, s.sector * 0.0022) + (elite ? 0.04 : 0), 0.65, 0.97),
-      bleedStacks: [],
-      bleedOnHit: 0,
-      healOnHit: 0,
-    };
+    
+    let enemy;
+    if (bossSide) {
+      // Use fixed boss stats
+      enemy = {
+        id: crypto.randomUUID(),
+        name: name,
+        bossSide,
+        elite: false,
+        visual: bossSide === "heaven" ? "ghost" : "demon",
+        traits: [],
+        hp: bossStats.hp,
+        maxHp: bossStats.hp,
+        damage: bossStats.damage,
+        armor: bossStats.armor,
+        evasion: bossStats.evasion,
+        accuracy: bossStats.accuracy,
+        bleedStacks: [],
+        bleedOnHit: bossStats.bleedOnHit || 0,
+        healOnHit: Math.round(bossStats.healOnHit ? bossStats.damage * bossStats.healOnHit : 0),
+      };
+    } else {
+      // Normal enemy scaling
+      enemy = {
+        id: crypto.randomUUID(),
+        name: elite ? `Элитный ${name}` : count > 1 ? `${name} ${index + 1}` : name,
+        bossSide,
+        elite,
+        visual: "beast",
+        traits: [],
+        hp: Math.round(
+          (82 + sectorCap * 12) * scaling * packPenalty * (elite ? 1.65 : 1)
+        ),
+        maxHp: 0,
+        damage: Math.round(
+          (11 + sectorCap * 1.6) * (count > 1 ? 0.78 : 1) * (elite ? 1.48 : 1)
+        ),
+        armor: Math.round((3 + sectorCap * 0.22) * (elite ? 1.24 : 1)),
+        evasion: clamp(0.04 + sectorCap * 0.0012 + (elite ? 0.04 : 0), 0.03, 0.24),
+        accuracy: clamp(0.82 + Math.min(0.14, sectorCap * 0.001) + (elite ? 0.04 : 0), 0.65, 0.97),
+        bleedStacks: [],
+        bleedOnHit: 0,
+        healOnHit: 0,
+      };
+    }
+    
     if (bossSide === "heaven") {
       enemy.traits.push("Судья");
-      enemy.evasion += 0.06;
-      enemy.armor = Math.round(enemy.armor * 1.35);
-      enemy.healOnHit = Math.max(2, Math.round(enemy.damage * 0.28));
     }
     if (bossSide === "hell") {
       enemy.traits.push("Палач");
-      enemy.damage = Math.round(enemy.damage * 1.18);
-      enemy.bleedOnHit = 0.35 + tierBoost * 0.02;
     }
     enemy.maxHp = enemy.hp;
     if (!bossSide) applyArchetypeMods(enemy, mob.archetype, elite, null);
-    else applyArchetypeMods(enemy, bossSide === "hell" ? "demon" : "ghost", false, bossSide);
     return enemy;
   });
   s.currentEnemy = s.enemyGroup[0];

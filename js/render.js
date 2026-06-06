@@ -436,9 +436,9 @@ export function render() {
   if (els.heavenSouls) els.heavenSouls.textContent = `${state.heavenSouls} / 5`;
   if (els.hellSouls) els.hellSouls.textContent = `${state.hellSouls} / 5`;
 
-  const inFight = Boolean(state.currentEnemy || getAliveEnemies().length);
-  if (els.summonHeaven) els.summonHeaven.disabled = state.heavenSouls < 5 || inFight || state.awaitingEvent;
-  if (els.summonHell) els.summonHell.disabled = state.hellSouls < 5 || inFight || state.awaitingEvent;
+  // Allow boss summoning anytime (except during events/choices)
+  if (els.summonHeaven) els.summonHeaven.disabled = state.heavenSouls < 5 || state.awaitingEvent;
+  if (els.summonHell) els.summonHell.disabled = state.hellSouls < 5 || state.awaitingEvent;
   if (els.upgradeCost) els.upgradeCost.textContent = `Стоимость: ${upgradeCost()} G`;
   if (els.upgradeHero) els.upgradeHero.disabled = state.gold < upgradeCost();
   if (els.rerollLoot) els.rerollLoot.disabled = !state.pendingLoot || state.gold < rerollCost();
