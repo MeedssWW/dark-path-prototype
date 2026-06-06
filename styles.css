@@ -396,6 +396,16 @@ body[data-location="abyss"] .stage-sky {
   transition: background-image 0.8s ease, opacity 0.8s ease;
 }
 
+.location-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  display: none;
+}
+
 .road-scene.hero-attack {
   box-shadow:
     inset 0 -80px 110px rgba(0, 0, 0, 0.62),
@@ -1428,6 +1438,75 @@ body[data-location="abyss"] .stage-sky {
   text-align: center;
 }
 
+.gear-action {
+  margin: 0 16px 8px;
+}
+
+.gear-action button {
+  width: 100%;
+}
+
+.artifacts-section {
+  margin: 0 16px 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.artifacts-section .label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.artifacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.artifact-badge {
+  padding: 8px 10px;
+  border: 1px solid;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: left;
+  cursor: help;
+  transition: all 140ms ease;
+}
+
+.artifact-badge:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.artifact-badge strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.artifact-badge small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.hint-text {
+  display: block;
+  color: var(--dim);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.muted-text {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+  text-align: center;
+}
+
 .boss-box {
   margin: 0 16px 16px;
   padding: 12px;
@@ -1812,13 +1891,20 @@ body[data-location="abyss"] .stage-sky {
   z-index: 2;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.7));
   display: none;
+  background-color: transparent;
+  image-rendering: crisp-edges;
 }
 .enemy-img[src]:not([src=""]) {
   display: block;
 }
-.enemy-img[src]:not([src=""]) ~ span,
-.enemy-portrait:has(.enemy-img[src]:not([src=""])))::before {
-  display: none;
+.enemy-img[src]:not([src=""]) ~ .enemy-silhouette {
+  display: none !important;
+}
+.enemy-portrait:has(.enemy-img[src]:not([src=""])) {
+  background-color: transparent;
+}
+.enemy-portrait:has(.enemy-img[src]:not([src=""]))::before {
+  display: none !important;
 }
 
 /* === NEW LOCATION THEMES === */
@@ -2302,6 +2388,39 @@ body[data-location="abyss"] .ruin-right {
 
 .overlay-card.wide {
   width: min(720px, 100%);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.modal-header .label {
+  margin: 0;
+}
+
+.close-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--red);
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 12px;
 }
 
 .overlay-desc {

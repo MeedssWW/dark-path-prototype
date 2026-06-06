@@ -479,6 +479,79 @@ export const itemEmojis = {
   cape: "🧣",
 };
 
+export const artifacts = [
+  {
+    id: "stone_heart",
+    name: "Каменное сердце",
+    rarity: "common",
+    description: "+15% здоровью. Снижает воздействие кровотечения на 20%.",
+    stats: { health: 0.15 },
+  },
+  {
+    id: "vampiric_fang",
+    name: "Вампирский клык",
+    rarity: "uncommon",
+    description: "+12% похищению жизни. Каждое исцеление даёт +1% урона до конца боя.",
+    stats: { lifeSteal: 0.12 },
+  },
+  {
+    id: "night_vision",
+    name: "Ночное зрение",
+    rarity: "uncommon",
+    description: "+18% точности. +8% крита против быстрых врагов.",
+    stats: { accuracy: 0.18 },
+  },
+  {
+    id: "blood_edge",
+    name: "Кровавое лезвие",
+    rarity: "rare",
+    description: "+20% кровотечению. Кровотечение наносит урон чаще на 25%.",
+    stats: { bleed: 0.20 },
+  },
+  {
+    id: "razor_focus",
+    name: "Боевой фокус",
+    rarity: "rare",
+    description: "+25% крита. Каждый крит восстанавливает 2% здоровья.",
+    stats: { crit: 0.25 },
+  },
+  {
+    id: "iron_skin",
+    name: "Железная кожа",
+    rarity: "rare",
+    description: "+22% броне. Каждый полученный удар снижает входящий урон на 1% (накапливается).",
+    stats: { armor: 0.22 },
+  },
+  {
+    id: "shadow_dance",
+    name: "Танец теней",
+    rarity: "epic",
+    description: "+30% уклонению. +15% скорости атаки.",
+    stats: { evasion: 0.30 },
+  },
+  {
+    id: "blessing_ruin",
+    name: "Благословение руин",
+    rarity: "epic",
+    description: "+28% урону и комбо. Босс Рая даёт +40% больше опыта.",
+    stats: { damage: 0.28, combo: 0.28 },
+  },
+  {
+    id: "curse_echo",
+    name: "Эхо проклятия",
+    rarity: "epic",
+    description: "+35% кровотечению и похищению жизни. Босс Ада даёт +40% больше золота.",
+    stats: { bleed: 0.35, lifeSteal: 0.35 },
+  },
+  {
+    id: "ancient_codex",
+    name: "Древний кодекс",
+    rarity: "legendary",
+    description: "Все статы +20%. Каждый уровень сектора даёт +2% ко всем бонусам.",
+    stats: { damage: 0.20, health: 0.20, crit: 0.20, armor: 0.20, accuracy: 0.20 },
+  },
+];
+
 export const BALANCE = {
   tickMs: 1550,
   upgradeBase: 75,

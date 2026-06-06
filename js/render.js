@@ -5,6 +5,7 @@ import {
   slotEmojis,
   itemEmojis,
   heroClasses,
+  artifacts,
 } from "./data.js";
 import {
   state,
@@ -43,6 +44,7 @@ export function bindElements() {
     "enemyPack",
     "enemyStage",
     "enemyPortrait",
+    "enemyImage",
     "enemyTraits",
     "roadScene",
     "playerWeapon",
@@ -87,6 +89,10 @@ export function bindElements() {
     "classOverlay",
     "tutorialOverlay",
     "rerollCost",
+    "gearModal",
+    "openGearModal",
+    "closeGearModal",
+    "artifactsList",
   ].forEach((id) => {
     els[id] = document.getElementById(id);
   });
@@ -113,6 +119,19 @@ function formatItemStats(item) {
   return Object.entries(item.stats)
     .map(([key, value]) => `${statLabels[key]} +${percentStats.has(key) ? `${Math.round(value * 100)}%` : Math.round(value)}`)
     .join(", ");
+}
+
+const locationVideoMap = {
+  "Черный Лес": "Черный_Лес.mp4",
+  "Разбитая Цитадель": "Разбитая_Цитадель.mp4",
+  "Пылающее Подземелье": "Пылающее_Подземелье.mp4",
+};
+
+function enemySpritePath(name) {
+  // Remove prefixes like "Элитный" from enemy names to use base sprite
+  let cleanName = name.replace(/^Элитный\s+/, "");
+  const fileName = cleanName.replace(/ /g, "_");
+  return `./assets/enemies/${fileName}.png`;
 }
 
 function renderComparison(comparison, current) {
@@ -280,6 +299,24 @@ function renderGear() {
     .join("");
 }
 
+function renderArtifacts() {
+  if (!els.artifactsList) return;
+  if (!state.artifacts || state.artifacts.length === 0) {
+    els.artifactsList.innerHTML = '<p class="muted-text">нет артефактов</p>';
+    return;
+  }
+  els.artifactsList.innerHTML = state.artifacts
+    .map((artifactId) => {
+      const artifact = artifacts.find((a) => a.id === artifactId);
+      if (!artifact) return "";
+      return `<div class="artifact-badge" title="${artifact.description}" style="border-color: ${artifact.rarity === "legendary" ? "#ffb84d" : "#62a8ff"}">
+        <strong style="color: ${artifact.rarity === "legendary" ? "#ffb84d" : "#62a8ff"}">${artifact.name}</strong>
+        <small>${artifact.description}</small>
+      </div>`;
+    })
+    .join("");
+}
+
 function renderDrops() {
   if (!els.dropSectorText || !els.dropChances) return;
   els.dropSectorText.textContent = `Сектор ${state.sector}`;
@@ -318,9 +355,25 @@ export function render() {
   document.body.dataset.location = location.tint;
 
   const bgEl = document.getElementById("roadSceneBg");
+  const locationVideo = document.getElementById("locationVideo");
   if (els.roadScene && els.roadScene.dataset.bgTint !== location.tint) {
     els.roadScene.dataset.bgTint = location.tint;
     if (bgEl) bgEl.style.backgroundImage = `url('./assets/locations/${location.tint}.png')`;
+  }
+
+  if (locationVideo) {
+    const videoFile = locationVideoMap[location.name];
+    if (videoFile) {
+      const src = `./assets/locations/${videoFile}`;
+      if (locationVideo.getAttribute("src") !== src) {
+        locationVideo.src = src;
+        locationVideo.load();
+      }
+      locationVideo.style.display = "block";
+    } else {
+      locationVideo.src = "";
+      locationVideo.style.display = "none";
+    }
   }
 
   if (els.locationName) els.locationName.textContent = location.name;
@@ -342,6 +395,11 @@ export function render() {
     els.enemyPortrait?.classList.toggle("elite", e.elite);
     ["beast", "knight", "demon", "ghost"].forEach((v) => els.enemyPortrait?.classList.remove(`enemy-${v}`));
     if (e.visual) els.enemyPortrait?.classList.add(`enemy-${e.visual}`);
+    if (els.enemyImage) {
+      const src = enemySpritePath(e.name);
+      els.enemyImage.src = src;
+      els.enemyImage.alt = e.name;
+    }
     if (els.enemyTraits)
       els.enemyTraits.innerHTML = (e.traits || []).map((t) => `<span class="trait-chip">${escapeHtml(t)}</span>`).join("");
     if (els.combatStatus) els.combatStatus.textContent = e.bossSide ? "Босс призван" : e.elite ? "Элитный бой" : "Автобой";
@@ -362,6 +420,7 @@ export function render() {
   renderHands();
   renderLoot();
   renderGear();
+  renderArtifacts();
   renderDrops();
   renderLog();
   renderBuffBar();

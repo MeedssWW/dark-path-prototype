@@ -59,10 +59,10 @@
 
           <div class="battlefield first-person">
             <div class="road-scene" id="roadScene">
-              <div class="road-scene-bg" id="roadSceneBg"></div>
-              <div class="road-lines"></div>
-              <div class="enemy-pack" id="enemyPack"></div>
-
+                <video id="locationVideo" class="location-video" autoplay muted loop playsinline></video>
+                <div class="road-scene-bg" id="roadSceneBg"></div>
+                <div class="road-lines"></div>
+                <div class="enemy-pack" id="enemyPack"></div>
               <div class="enemy-stage" id="enemyStage">
                 <div class="enemy-nameplate">
                   <strong id="enemyName">Враг</strong>
@@ -71,6 +71,7 @@
                 <div class="hp-track enemy-track"><div id="enemyHpBar"></div></div>
                 <div class="enemy-traits" id="enemyTraits"></div>
                 <div class="portrait enemy-portrait" id="enemyPortrait">
+                  <img id="enemyImage" class="enemy-img" alt="Enemy" />
                   <span class="enemy-silhouette"></span>
                 </div>
               </div>
@@ -160,6 +161,12 @@
             <p id="upgradeCost">Стоимость: 0 G</p>
           </div>
 
+          <div class="artifacts-section">
+            <span class="label">Артефакты</span>
+            <div id="artifactsList" class="artifacts-list"></div>
+            <small class="hint-text">Пассивные бонусы. Нажми на модальное окно экипировки.</small>
+          </div>
+
           <div class="boss-box">
             <div class="souls">
               <div>
@@ -205,7 +212,9 @@
             <p id="rerollCost" class="reroll-hint">Перековка: 0 G</p>
           </div>
 
-          <div id="gearGrid" class="gear-grid"></div>
+          <div class="gear-action">
+            <button id="openGearModal" class="primary-button" type="button">Снаряжение</button>
+          </div>
 
           <div class="drop-panel">
             <div class="drop-head">
@@ -241,6 +250,16 @@
           <button id="tutorialSkip" class="ghost-button" type="button">Пропустить</button>
           <button id="tutorialNext" class="primary-button" type="button">Далее</button>
         </div>
+      </div>
+    </div>
+
+    <div id="gearModal" class="game-overlay hidden">
+      <div class="overlay-card wide">
+        <div class="modal-header">
+          <p class="label">Экипировка</p>
+          <button id="closeGearModal" class="close-button" type="button">✕</button>
+        </div>
+        <div id="gearGrid" class="gear-grid modal-grid"></div>
       </div>
     </div>
 

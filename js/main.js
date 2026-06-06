@@ -212,6 +212,20 @@ function init() {
   els.summonHeaven?.addEventListener("click", () => summonBoss("heaven"));
   els.summonHell?.addEventListener("click", () => summonBoss("hell"));
 
+  els.openGearModal?.addEventListener("click", () => {
+    els.gearModal?.classList.remove("hidden");
+  });
+
+  els.closeGearModal?.addEventListener("click", () => {
+    els.gearModal?.classList.add("hidden");
+  });
+
+  els.gearModal?.addEventListener("click", (e) => {
+    if (e.target === els.gearModal) {
+      els.gearModal.classList.add("hidden");
+    }
+  });
+
   els.resetRun?.addEventListener("click", () => {
     if (!confirm("Сбросить прогресс?")) return;
     localStorage.removeItem(SAVE_KEY);

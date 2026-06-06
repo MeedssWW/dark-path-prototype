@@ -34,6 +34,7 @@ export const defaultState = {
   milestonesSeen: {},
   nextEliteChance: 0,
   stats: { heavenBosses: 0, hellBosses: 0, epicSlots: 0 },
+  artifacts: [],
 };
 
 export let state = loadState();
