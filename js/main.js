@@ -229,6 +229,29 @@ function init() {
   els.summonHeaven?.addEventListener("click", () => summonBoss("heaven"));
   els.summonHell?.addEventListener("click", () => summonBoss("hell"));
 
+  // Setup tab switching
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const sidePanels = document.querySelectorAll(".side-panel");
+  
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tabName = btn.dataset.tab;
+      
+      // Update active button
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      
+      // Update active panel
+      sidePanels.forEach((panel) => {
+        if (panel.dataset.tab === tabName) {
+          panel.classList.add("active");
+        } else {
+          panel.classList.remove("active");
+        }
+      });
+    });
+  });
+
   els.openGearModal?.addEventListener("click", () => {
     els.gearModal?.classList.remove("hidden");
   });

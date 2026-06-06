@@ -122,7 +122,13 @@
           </div>
         </section>
 
-        <aside class="side-panel hero-panel">
+        <div class="tabs-bar" id="tabsBar">
+          <button class="tab-button active" data-tab="stats" type="button">Статистика</button>
+          <button class="tab-button" data-tab="loot" type="button">Лут</button>
+          <button class="tab-button" data-tab="artifacts" type="button">Артефакты</button>
+        </div>
+
+        <aside class="side-panel hero-panel active" data-tab="stats">
           <div class="panel-head">
             <div>
               <p class="label">Персонаж</p>
@@ -185,7 +191,7 @@
           </div>
         </aside>
 
-        <aside class="side-panel loot-panel">
+        <aside class="side-panel loot-panel" data-tab="loot">
           <div class="panel-head">
             <div>
               <p class="label">Добыча</p>
@@ -223,6 +229,14 @@
             </div>
             <div id="dropChances" class="drop-chances"></div>
           </div>
+        </aside>
+
+        <aside class="side-panel artifacts-panel" data-tab="artifacts">
+          <div class="panel-head">
+            <p class="label">Артефакты</p>
+          </div>
+          <div id="artifactsList" class="artifacts-list"></div>
+          <small class="hint-text">Пассивные бонусы. Нажми на модальное окно экипировки.</small>
         </aside>
       </main>
     </div>
