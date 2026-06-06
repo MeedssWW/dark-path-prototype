@@ -399,6 +399,12 @@ export function render() {
       const src = enemySpritePath(e.name);
       els.enemyImage.src = src;
       els.enemyImage.alt = e.name;
+      els.enemyImage.onerror = () => {
+        els.enemyImage.style.display = 'none';
+      };
+      els.enemyImage.onload = () => {
+        els.enemyImage.style.display = 'block';
+      };
     }
     if (els.enemyTraits)
       els.enemyTraits.innerHTML = (e.traits || []).map((t) => `<span class="trait-chip">${escapeHtml(t)}</span>`).join("");

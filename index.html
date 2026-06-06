@@ -57,6 +57,13 @@
             <div class="encounter-row" id="encounterPips"></div>
           </div>
 
+          <div class="game-controls">
+            <button id="audioToggle" class="icon-button" type="button" title="Музыка">♪</button>
+            <button id="pauseToggle" class="ghost-button small" type="button">Пауза</button>
+            <button id="speedToggle" class="ghost-button small speed-btn" type="button">1x</button>
+            <button id="resetRun" class="icon-button" type="button" title="Сброс">↻</button>
+          </div>
+
           <div class="battlefield first-person">
             <div class="road-scene" id="roadScene">
                 <video id="locationVideo" class="location-video" autoplay muted loop playsinline></video>
@@ -151,12 +158,16 @@
               <p class="label">Персонаж</p>
               <h2>Характеристики</h2>
             </div>
-            <div class="gold-pill"><span id="goldValue">0</span> G</div>
+            <button class="close-panel-btn" type="button">✕</button>
           </div>
 
           <p class="class-badge-line">Класс: <strong id="classBadge">—</strong></p>
 
           <div class="level-row">
+            <div>
+              <span class="label">Золото</span>
+              <strong id="goldValue">0</strong>
+            </div>
             <div>
               <span class="label">Улучшений</span>
               <strong id="upgradeCount">0</strong>
@@ -214,7 +225,7 @@
               <p class="label">Добыча</p>
               <h2>Снаряжение</h2>
             </div>
-            <div id="lootRarityBadge" class="rarity-badge">Обычный</div>
+            <button class="close-panel-btn" type="button">✕</button>
           </div>
 
           <div class="gear-action">
@@ -232,7 +243,11 @@
 
         <aside class="side-panel artifacts-panel" data-tab="artifacts">
           <div class="panel-head">
-            <p class="label">Артефакты</p>
+            <div>
+              <p class="label">Артефакты</p>
+              <h2>Пассивные бонусы</h2>
+            </div>
+            <button class="close-panel-btn" type="button">✕</button>
           </div>
           <div id="artifactsList" class="artifacts-list"></div>
           <small class="hint-text">Пассивные бонусы. Нажми на модальное окно экипировки.</small>

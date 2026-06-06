@@ -60,17 +60,13 @@ button:disabled {
 }
 
 .app-shell {
-  width: min(1500px, calc(100vw - 28px));
+  width: 100%;
   margin: 0 auto;
-  padding: 18px 0 28px;
+  padding: 0;
 }
 
 .topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+  display: none;
 }
 
 .brand {
@@ -176,7 +172,7 @@ small {
 .game-layout {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 80px);
+  height: 100vh;
   gap: 0;
   overflow: hidden;
   padding-bottom: 56px;
@@ -187,12 +183,11 @@ small {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
+  border: none;
+  border-radius: 0;
   background:
     linear-gradient(180deg, rgba(14, 15, 19, 0.5), rgba(14, 12, 13, 0.95)),
     #111115;
-  box-shadow: var(--shadow);
 }
 
 .stage-sky {
@@ -282,11 +277,15 @@ body[data-location="abyss"] .stage-sky {
 }
 
 .path-card {
-  margin: 18px;
-  padding: 16px;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 10;
+  padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(10, 10, 12, 0.62);
+  background: rgba(10, 10, 12, 0.75);
   backdrop-filter: blur(14px);
 }
 
@@ -1276,17 +1275,39 @@ body[data-location="abyss"] .stage-sky {
 }
 
 .event-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 150;
+  width: 90%;
+  max-width: 420px;
   display: grid;
   gap: 14px;
-  margin: 0 18px 14px;
-  padding: 16px;
-  border: 1px solid rgba(213, 170, 84, 0.28);
-  border-radius: 8px;
-  background: rgba(16, 13, 12, 0.88);
-  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.36);
+  padding: 20px;
+  border: 2px solid var(--line-strong);
+  border-radius: 16px;
+  background: rgba(16, 13, 12, 0.98);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(16px);
+  transform: translate(-50%, -50%) scale(0.9);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
 }
 
-.event-panel.hidden,
+.event-panel:not(.hidden) {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.event-panel.hidden {
+  display: grid !important;
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .loot-card.hidden {
   display: none;
 }
@@ -1304,59 +1325,34 @@ body[data-location="abyss"] .stage-sky {
 }
 
 .log-panel {
-  margin: 0 18px 18px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(6, 6, 7, 0.66);
+  display: none;
 }
 
-.log-header {
+.game-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
   display: flex;
+  gap: 6px;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
-  color: var(--gold);
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.battle-log {
-  height: 148px;
-  overflow: auto;
-  padding: 10px 12px;
-}
-
-.battle-log p {
-  padding: 4px 0;
-  color: #c8bdab;
-  font-size: 12px;
-  line-height: 1.35;
 }
 
 .side-panel {
   position: fixed;
-  bottom: 56px;
+  top: 0;
   left: 0;
   right: 0;
-  z-index: 50;
-  border: 1px solid var(--line);
-  border-radius: 16px 16px 0 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 28%),
-    var(--panel);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(14px);
-  max-height: 70vh;
+  bottom: 0;
+  z-index: 100;
+  background: var(--bg);
   overflow-y: auto;
-  transform: translateY(calc(100% + 56px));
+  transform: translateX(100%);
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .side-panel.active {
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
 .hero-panel {
@@ -1408,6 +1404,22 @@ body[data-location="abyss"] .stage-sky {
   border-color: #d4a574;
 }
 
+.close-panel-btn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  font-size: 20px;
+  line-height: 1;
+  border-radius: 8px;
+}
+
+.close-panel-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--gold);
+}
+
 .panel-head {
   display: flex;
   align-items: center;
@@ -1415,6 +1427,10 @@ body[data-location="abyss"] .stage-sky {
   gap: 12px;
   padding: 16px;
   border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
 }
 
 .gold-pill,
@@ -1427,7 +1443,7 @@ body[data-location="abyss"] .stage-sky {
 
 .level-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
   padding: 14px 16px 0;
 }

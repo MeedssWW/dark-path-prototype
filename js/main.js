@@ -332,6 +332,15 @@ function init() {
   // Setup tab switching
   const tabButtons = document.querySelectorAll(".tab-button");
   const sidePanels = document.querySelectorAll(".side-panel");
+  const closePanelBtns = document.querySelectorAll(".close-panel-btn");
+  
+  // Закрытие панели по кнопке X
+  closePanelBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      sidePanels.forEach((panel) => panel.classList.remove("active"));
+    });
+  });
   
   // Закрытие панели при клике на игровое поле
   els.roadScene?.addEventListener("click", () => {
