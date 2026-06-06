@@ -333,15 +333,31 @@ function init() {
   const tabButtons = document.querySelectorAll(".tab-button");
   const sidePanels = document.querySelectorAll(".side-panel");
   
+  // Закрытие панели при клике на игровое поле
+  els.roadScene?.addEventListener("click", () => {
+    const hasActivePanel = Array.from(sidePanels).some(p => p.classList.contains("active"));
+    if (hasActivePanel) {
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      sidePanels.forEach((panel) => panel.classList.remove("active"));
+    }
+  });
+  
   tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const tabName = btn.dataset.tab;
+      const isCurrentlyActive = btn.classList.contains("active");
       
-      // Update active button
+      // Если кликнули на активную кнопку - закрываем панель
+      if (isCurrentlyActive) {
+        tabButtons.forEach((b) => b.classList.remove("active"));
+        sidePanels.forEach((panel) => panel.classList.remove("active"));
+        return;
+      }
+      
+      // Иначе открываем нужную панель
       tabButtons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       
-      // Update active panel
       sidePanels.forEach((panel) => {
         if (panel.dataset.tab === tabName) {
           panel.classList.add("active");

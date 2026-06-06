@@ -176,9 +176,10 @@ small {
 .game-layout {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 80px);
   gap: 0;
   overflow: hidden;
+  padding-bottom: 56px;
 }
 
 .stage-panel {
@@ -1336,20 +1337,26 @@ body[data-location="abyss"] .stage-sky {
 }
 
 .side-panel {
+  position: fixed;
+  bottom: 56px;
+  left: 0;
+  right: 0;
+  z-index: 50;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 16px 16px 0 0;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 28%),
     var(--panel);
-  box-shadow: var(--shadow);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(14px);
-  display: none;
+  max-height: 70vh;
   overflow-y: auto;
-  max-height: 300px;
+  transform: translateY(calc(100% + 56px));
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .side-panel.active {
-  display: block;
+  transform: translateY(0);
 }
 
 .hero-panel {
@@ -1362,12 +1369,17 @@ body[data-location="abyss"] .stage-sky {
 }
 
 .tabs-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
   display: flex;
   gap: 8px;
   padding: 8px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(8, 8, 10, 0.95);
   border-top: 1px solid var(--line);
-  order: 10;
+  backdrop-filter: blur(10px);
 }
 
 .tab-button {
@@ -2191,7 +2203,7 @@ body[data-location="abyss"] .ruin-right {
   }
 
   .side-panel {
-    max-height: 280px;
+    max-height: 60vh;
   }
 }
 
