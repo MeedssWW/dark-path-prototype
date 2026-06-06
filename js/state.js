@@ -101,6 +101,27 @@ export function normalizeState(s) {
   return s;
 }
 
+export function equipPendingLoot(s = state) {
+  if (!s.pendingLoot) return;
+  const item = s.pendingLoot;
+  // Предметы в inventory хранятся по ключу слота (weapon, chest и т.д.)
+  s.inventory[item.slot] = item;
+  s.pendingLoot = null;
+  updateEpicStat(s);
+  addLog(s, `Надето: ${item.name}`);
+  saveState();
+}
+
+export function sellPendingLoot(s = state) {
+  if (!s.pendingLoot) return;
+  const item = s.pendingLoot;
+  const gold = item.rarity?.value || 15;
+  s.gold += gold;
+  s.pendingLoot = null;
+  addLog(s, `Продано: ${item.name} за ${gold} G`);
+  saveState();
+}
+
 export function locationForSector(sector) {
   return locations[Math.floor((sector - 1) / BALANCE.sectorsPerLocation) % locations.length];
 }

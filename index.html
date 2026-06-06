@@ -101,6 +101,23 @@
             </div>
           </div>
 
+          <!-- Карточка лута теперь здесь, чтобы быть поверх игры -->
+          <div class="loot-card hidden" id="lootCard">
+            <div class="loot-top">
+              <div id="lootIcon" class="item-icon large"></div>
+              <div>
+                <span class="label">Найдено снаряжение!</span>
+                <h3 id="lootName">Предмет</h3>
+                <p id="lootStats"></p>
+              </div>
+            </div>
+            <div id="lootCompare" class="loot-compare"></div>
+            <div class="swipe-hint">
+              <span>← Продать</span>
+              <span>Надеть →</span>
+            </div>
+          </div>
+
           <div class="event-panel hidden" id="eventPanel">
             <div>
               <p class="label" id="eventKind">Событие</p>
@@ -198,24 +215,6 @@
               <h2>Снаряжение</h2>
             </div>
             <div id="lootRarityBadge" class="rarity-badge">Обычный</div>
-          </div>
-
-          <div class="loot-card hidden" id="lootCard">
-            <div class="loot-top">
-              <div id="lootIcon" class="item-icon large"></div>
-              <div>
-                <span class="label">Новый предмет</span>
-                <h3 id="lootName">Предмет</h3>
-                <p id="lootStats"></p>
-              </div>
-            </div>
-            <div id="lootCompare" class="loot-compare"></div>
-            <div class="loot-actions">
-              <button id="equipLoot" class="primary-button" type="button">Надеть</button>
-              <button id="sellLoot" class="ghost-button" type="button">Продать</button>
-              <button id="rerollLoot" class="ghost-button" type="button">Перековать</button>
-            </div>
-            <p id="rerollCost" class="reroll-hint">Перековка: 0 G</p>
           </div>
 
           <div class="gear-action">

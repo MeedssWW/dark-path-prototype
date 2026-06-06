@@ -186,6 +186,105 @@ function summonBoss(side) {
   render();
 }
 
+function setupLootSwipes() {
+  let startX = 0, currentX = 0, isDragging = false;
+  if (!els.lootCard) return;
+
+  // Touch события
+  els.lootCard.addEventListener('touchstart', (e) => {
+    if (!state.pendingLoot) return;
+    startX = e.touches[0].clientX;
+    currentX = 0;
+    isDragging = true;
+    els.lootCard.classList.add('dragging');
+    els.lootCard.style.transition = 'none';
+  }, { passive: true });
+
+  els.lootCard.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    currentX = e.touches[0].clientX - startX;
+    const rotation = currentX * 0.05;
+    els.lootCard.style.transform = `translate(calc(-50% + ${currentX}px), -50%) rotate(${rotation}deg)`;
+    
+    // Визуальная подсказка
+    els.lootCard.classList.remove('swipe-left', 'swipe-right');
+    if (currentX > 50) els.lootCard.classList.add('swipe-right');
+    else if (currentX < -50) els.lootCard.classList.add('swipe-left');
+  }, { passive: true });
+
+  els.lootCard.addEventListener('touchend', handleSwipeEnd);
+
+  // Mouse события
+  els.lootCard.addEventListener('mousedown', (e) => {
+    if (!state.pendingLoot) return;
+    startX = e.clientX;
+    currentX = 0;
+    isDragging = true;
+    els.lootCard.classList.add('dragging');
+    els.lootCard.style.transition = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    currentX = e.clientX - startX;
+    const rotation = currentX * 0.05;
+    els.lootCard.style.transform = `translate(calc(-50% + ${currentX}px), -50%) rotate(${rotation}deg)`;
+    
+    // Визуальная подсказка
+    els.lootCard.classList.remove('swipe-left', 'swipe-right');
+    if (currentX > 50) els.lootCard.classList.add('swipe-right');
+    else if (currentX < -50) els.lootCard.classList.add('swipe-left');
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    handleSwipeEnd();
+  });
+
+  function handleSwipeEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    els.lootCard.classList.remove('dragging', 'swipe-left', 'swipe-right');
+    els.lootCard.style.transition = 'transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s';
+    
+    const threshold = 100;
+    
+    if (currentX > threshold) {
+      // Свайп вправо — надеть
+      els.lootCard.style.transform = 'translate(calc(150%), -50%) rotate(20deg)';
+      els.lootCard.style.opacity = '0';
+      setTimeout(() => {
+        equipPendingLoot();
+        checkMilestones(state);
+        saveState();
+        render();
+        resetLootCardStyle();
+      }, 300);
+    } else if (currentX < -threshold) {
+      // Свайп влево — продать
+      els.lootCard.style.transform = 'translate(calc(-250%), -50%) rotate(-20deg)';
+      els.lootCard.style.opacity = '0';
+      setTimeout(() => {
+        sellPendingLoot();
+        checkMilestones(state);
+        saveState();
+        render();
+        resetLootCardStyle();
+      }, 300);
+    } else {
+      // Возврат на место
+      resetLootCardStyle();
+    }
+  }
+
+  function resetLootCardStyle() {
+    els.lootCard.style.transform = '';
+    els.lootCard.style.opacity = '';
+    els.lootCard.style.transition = '';
+  }
+}
+
 function init() {
   bindElements();
   setupClassOverlay();
@@ -193,6 +292,7 @@ function init() {
   updateEpicStat();
   render();
   checkMilestones(state);
+  setupLootSwipes();
 
   els.pauseToggle?.addEventListener("click", () => {
     state.paused = !state.paused;
