@@ -192,7 +192,10 @@ function renderEnemyPack() {
   els.enemyPack.innerHTML = enemies
     .map((enemy, index) => {
       const active = state.currentEnemy?.id === enemy.id ? "active" : "";
-      return `<span class="${active} ${enemy.bossSide ? "boss" : ""} ${enemy.elite ? "elite" : ""} enemy-pack-${enemy.visual || "beast"}" style="--i:${index}; --hp:${clamp(enemy.hp / enemy.maxHp, 0, 1)}" title="${enemy.name}"></span>`;
+      const imgSrc = enemySpritePath(enemy.name);
+      return `<span class="${active} ${enemy.bossSide ? "boss" : ""} ${enemy.elite ? "elite" : ""} enemy-pack-${enemy.visual || "beast"}" style="--i:${index}; --hp:${clamp(enemy.hp / enemy.maxHp, 0, 1)}" title="${enemy.name}">
+        <img src="${imgSrc}" alt="${enemy.name}" class="enemy-pack-img" onerror="this.style.display='none'">
+      </span>`;
     })
     .join("");
   els.enemyPack.classList.toggle("hidden", enemies.length <= 1);

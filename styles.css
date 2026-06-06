@@ -576,6 +576,19 @@ body[data-location="abyss"] .stage-sky {
   opacity: 0.72;
   transform: translateY(4px) scale(0.86);
   filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.58));
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.enemy-pack-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  z-index: 2;
+  border-radius: 8px;
 }
 
 .enemy-pack span:nth-child(2) {
@@ -595,6 +608,11 @@ body[data-location="abyss"] .stage-sky {
     radial-gradient(circle at 50% 18%, #b84b45 0 18%, transparent 19%),
     linear-gradient(180deg, transparent 0 28%, #351719 29% 70%, #171012 71% 100%);
   clip-path: polygon(50% 0, 82% 24%, 76% 100%, 24% 100%, 18% 24%);
+  z-index: 1;
+}
+
+.enemy-pack span:has(.enemy-pack-img)::before {
+  display: none;
 }
 
 .enemy-pack span::after {
