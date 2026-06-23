@@ -156,7 +156,7 @@ function processChromaKey(src) {
 }
 
 function loadFpAssets() {
-  const v = Date.now(); // Cache buster
+  const v = 8; // Fixed cache buster to avoid redownloading 2MB every refresh
   processChromaKey(`./assets/first_person/left_arm.png?v=${v}`).then(url => {
     if(els.realLeftArm) { els.realLeftArm.src = url; }
   });
