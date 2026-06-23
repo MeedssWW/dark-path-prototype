@@ -178,6 +178,14 @@ small {
   padding-bottom: 56px;
 }
 
+.battle-section {
+  position: relative;
+  flex: 1; min-height: 340px;
+  background: var(--bg);
+  overflow: hidden;
+  border-bottom: 2px solid var(--line-strong);
+}
+
 .stage-panel {
   position: relative;
   flex: 1;
@@ -2766,10 +2774,11 @@ body[data-location="abyss"] .ruin-right {
   transition: width 0.3s ease;
 }
 
-.battle-section { position: relative; flex-shrink: 0; display: flex; flex-direction: column; }
+.battle-section { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 380px; }
 .battle-section .road-scene {
   position: relative;
-  height: 380px;
+  flex: 1;
+  height: auto;
   inset: auto;
   border: none;
   border-radius: 0;
@@ -2916,15 +2925,15 @@ body[data-location="abyss"] .ruin-right {
 .fp-item { position: absolute; z-index: -1; }
 .fp-talisman {
   width: 60px !important; height: 60px !important;
-  left: 60px; top: 20px;
+  left: 60px; bottom: 100px; top: auto;
   filter: drop-shadow(0 0 10px rgba(100,200,255,0.8));
   animation: hover-talisman 3s ease-in-out infinite;
   z-index: 2 !important; /* in front of open palm */
 }
 .fp-weapon {
   width: 100px !important; height: 200px !important;
-  right: 50px; bottom: 80px;
-  transform: rotate(15deg);
+  right: 60px; bottom: 30px;
+  transform: rotate(-5deg);
   z-index: -1 !important; /* behind gripped hand */
 }
 
