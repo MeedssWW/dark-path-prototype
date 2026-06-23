@@ -559,6 +559,11 @@ export function render() {
   if (els.summonHeaven) els.summonHeaven.disabled = state.heavenSouls < 5 || state.awaitingEvent;
   if (els.summonHell) els.summonHell.disabled = state.hellSouls < 5 || state.awaitingEvent;
   if (els.upgradeCost) els.upgradeCost.textContent = `Стоимость: ${upgradeCost()} G`;
+  if (els.upgradeHero) els.upgradeHero.disabled = state.gold < upgradeCost();
+  if (els.rerollLoot) els.rerollLoot.disabled = !state.pendingLoot || state.gold < rerollCost();
+  if (els.rerollCost) els.rerollCost.textContent = `Перековка: ${rerollCost()} G`;
+
+  updateOverlays();
 }
 
 export function showItemDetails(slotKey) {
@@ -598,11 +603,4 @@ export function showItemDetails(slotKey) {
     .join("");
     
   els.itemDetailsOverlay?.classList.remove("hidden");
-}
-
-  if (els.upgradeHero) els.upgradeHero.disabled = state.gold < upgradeCost();
-  if (els.rerollLoot) els.rerollLoot.disabled = !state.pendingLoot || state.gold < rerollCost();
-  if (els.rerollCost) els.rerollCost.textContent = `Перековка: ${rerollCost()} G`;
-
-  updateOverlays();
 }
