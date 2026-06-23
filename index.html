@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Dark Path Prototype</title>
-    <link rel="stylesheet" href="./styles.css?v=3" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
   </head>
   <body>
     <div class="app-shell">
@@ -60,12 +60,14 @@
           </div>
 
           <!-- Player hands -->
-          <div class="player-hands">
-            <div class="hand hand-left"></div>
-            <div class="talisman-orb" id="playerOffhand"></div>
-            <div class="hand hand-right"></div>
-            <div class="sword" id="playerWeapon">
-              <span></span>
+          <div class="player-hands" id="playerHands">
+            <div class="real-hand-left">
+              <img id="realLeftArm" src="" style="display:none" />
+              <img id="playerOffhandImg" class="fp-item fp-talisman" src="" style="display:none" />
+            </div>
+            <div class="real-hand-right">
+              <img id="playerWeaponImg" class="fp-item fp-weapon" src="" style="display:none" />
+              <img id="realRightArm" src="" style="display:none" />
             </div>
           </div>
 
@@ -244,6 +246,6 @@
     <audio id="musicPlayer" loop preload="none">
       <source src="./assets/hide-cs01-slowed.mp3" type="audio/mpeg" />
     </audio>
-    <script type="module" src="./js/main.js?v=3"></script>
+    <script type="module" src="./js/main.js?v=4"></script>
   </body>
 </html>

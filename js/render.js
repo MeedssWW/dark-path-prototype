@@ -47,8 +47,10 @@ export function bindElements() {
     "enemyImage",
     "enemyTraits",
     "roadScene",
-    "playerWeapon",
-    "playerOffhand",
+    "playerWeaponImg",
+    "playerOffhandImg",
+    "realLeftArm",
+    "realRightArm",
     "combatStatus",
     "starCharge",
     "eventPanel",
@@ -100,6 +102,66 @@ export function bindElements() {
 
 export function setSpeedMultiplier(v) {
   setFxSpeed(v);
+}
+
+// Chroma Key (Green Screen Removal) utility
+const chromaCache = new Map();
+function processChromaKey(src) {
+  if (chromaCache.has(src)) return Promise.resolve(chromaCache.get(src));
+  
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0);
+      try {
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          let r = data[i], g = data[i+1], b = data[i+2];
+          // Detect strong green: Green is dominant
+          if (g > 120 && r < 120 && b < 120 && g > r * 1.5 && g > b * 1.5) {
+            // Compute how "pure" the green is
+            let maxOther = Math.max(r, b);
+            if (g > maxOther + 40) {
+              data[i+3] = 0; // Fully transparent
+            } else {
+              // Partial transparency for edge blending
+              data[i+3] = Math.max(0, 255 - (g - maxOther) * 3);
+            }
+          }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        const dataUrl = canvas.toDataURL("image/png");
+        chromaCache.set(src, dataUrl);
+        resolve(dataUrl);
+      } catch (e) {
+        console.error("Chroma key error", e);
+        resolve(src);
+      }
+    };
+    img.onerror = () => resolve(src);
+    img.src = src;
+  });
+}
+
+function loadFpAssets() {
+  processChromaKey("./assets/first_person/left_arm.png").then(url => {
+    if(els.realLeftArm) { els.realLeftArm.src = url; els.realLeftArm.style.display = 'block'; }
+  });
+  processChromaKey("./assets/first_person/right_arm.png").then(url => {
+    if(els.realRightArm) { els.realRightArm.src = url; els.realRightArm.style.display = 'block'; }
+  });
+  processChromaKey("./assets/first_person/sword.png").then(url => {
+    if(els.playerWeaponImg) { els.playerWeaponImg.src = url; }
+  });
+  processChromaKey("./assets/first_person/talisman.png").then(url => {
+    if(els.playerOffhandImg) { els.playerOffhandImg.src = url; }
+  });
 }
 
 function getSlotIcon(item) {
@@ -228,6 +290,16 @@ function renderEvent() {
     });
     els.eventActions.appendChild(button);
   });
+  
+  els.speedToggle?.addEventListener("click", () => {
+    state.speed = state.speed === 1 ? 2 : state.speed === 2 ? 4 : 1;
+    setSpeedMultiplier(state.speed);
+    els.speedToggle.textContent = `${state.speed}x`;
+    if (state.speed > 1) els.speedToggle.classList.add("active");
+    else els.speedToggle.classList.remove("active");
+  });
+  
+  loadFpAssets();
 }
 
 function renderStats(heroStats) {
@@ -244,12 +316,30 @@ function renderStats(heroStats) {
 function renderHands() {
   const weapon = state.inventory.weapon;
   const offhand = state.inventory.talisman;
-  const weaponVisual = getItemVisual(weapon);
-  const offhandVisual = getItemVisual(offhand);
-  els.roadScene?.classList.toggle("has-weapon", Boolean(weapon));
-  els.roadScene?.classList.toggle("has-offhand", Boolean(offhand));
-  if (els.playerWeapon) els.playerWeapon.className = `sword ${weaponVisual ? `weapon-${weaponVisual}` : ""}`.trim();
-  if (els.playerOffhand) els.playerOffhand.className = `talisman-orb ${offhandVisual ? `offhand-${offhandVisual}` : ""}`.trim();
+  
+  // Hand rendering
+  if (els.realLeftArm) {
+    els.realLeftArm.style.display = 'block';
+  }
+  if (els.realRightArm) {
+    els.realRightArm.style.display = 'block';
+  }
+
+  // Weapon and Offhand
+  if (els.playerWeaponImg) {
+    if (weapon) {
+      els.playerWeaponImg.style.display = 'block';
+    } else {
+      els.playerWeaponImg.style.display = 'none';
+    }
+  }
+  if (els.playerOffhandImg) {
+    if (offhand) {
+      els.playerOffhandImg.style.display = 'block';
+    } else {
+      els.playerOffhandImg.style.display = 'none';
+    }
+  }
 }
 
 function renderLoot() {
