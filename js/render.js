@@ -114,10 +114,17 @@ function processChromaKey(src) {
     // Do NOT set crossOrigin, since we are on the same domain it causes CORS cache poisoning on GH Pages
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
+      // Downscale for massive performance boost
+      let scale = 1;
+      const maxDim = 256; 
+      if (img.width > maxDim || img.height > maxDim) {
+        scale = maxDim / Math.max(img.width, img.height);
+      }
+      canvas.width = Math.floor(img.width * scale);
+      canvas.height = Math.floor(img.height * scale);
+      
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       try {
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const data = imgData.data;
@@ -134,7 +141,8 @@ function processChromaKey(src) {
           }
         }
         ctx.putImageData(imgData, 0, 0);
-        const dataUrl = canvas.toDataURL("image/png");
+        // Use webp for smaller data URL, faster decoding
+        const dataUrl = canvas.toDataURL("image/webp", 0.8);
         chromaCache.set(src, dataUrl);
         resolve(dataUrl);
       } catch (e) {
