@@ -343,6 +343,7 @@ function renderHands() {
   if (els.playerWeaponImg) {
     if (weapon) {
       els.playerWeaponImg.style.display = 'block';
+      els.playerWeaponImg.src = `./assets/equipment/${weapon.type.key}.png`;
     } else {
       els.playerWeaponImg.style.display = 'none';
     }
@@ -350,6 +351,7 @@ function renderHands() {
   if (els.playerOffhandImg) {
     if (offhand) {
       els.playerOffhandImg.style.display = 'block';
+      els.playerOffhandImg.src = `./assets/equipment/${offhand.type.key}.png`;
     } else {
       els.playerOffhandImg.style.display = 'none';
     }
