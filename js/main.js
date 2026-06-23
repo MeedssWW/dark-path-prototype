@@ -329,49 +329,35 @@ function init() {
   els.summonHeaven?.addEventListener("click", () => summonBoss("heaven"));
   els.summonHell?.addEventListener("click", () => summonBoss("hell"));
 
-  // Setup tab switching
-  const tabButtons = document.querySelectorAll(".tab-button");
-  const sidePanels = document.querySelectorAll(".side-panel");
-  const closePanelBtns = document.querySelectorAll(".close-panel-btn");
-  
-  // Закрытие панели по кнопке X
-  closePanelBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      tabButtons.forEach((b) => b.classList.remove("active"));
-      sidePanels.forEach((panel) => panel.classList.remove("active"));
-    });
-  });
-  
-  // Закрытие панели при клике на игровое поле
-  els.roadScene?.addEventListener("click", () => {
-    const hasActivePanel = Array.from(sidePanels).some(p => p.classList.contains("active"));
-    if (hasActivePanel) {
-      tabButtons.forEach((b) => b.classList.remove("active"));
-      sidePanels.forEach((panel) => panel.classList.remove("active"));
-    }
-  });
+  // Setup bottom tab switching
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabPanels = document.querySelectorAll(".tab-panel");
   
   tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const tabName = btn.dataset.tab;
-      const isCurrentlyActive = btn.classList.contains("active");
       
-      // Если кликнули на активную кнопку - закрываем панель
-      if (isCurrentlyActive) {
-        tabButtons.forEach((b) => b.classList.remove("active"));
-        sidePanels.forEach((panel) => panel.classList.remove("active"));
+      // Reset tab — special action
+      if (tabName === "reset") {
+        if (!confirm("Сбросить прогресс?")) return;
+        localStorage.removeItem(SAVE_KEY);
+        localStorage.removeItem("dark-path-prototype-save-v1");
+        combatAnimating = false;
+        setState(structuredClone(defaultState));
+        tutorialIndex = 0;
+        startTickLoop();
+        render();
         return;
       }
       
-      // Иначе открываем нужную панель
       tabButtons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       
-      sidePanels.forEach((panel) => {
+      tabPanels.forEach((panel) => {
         if (panel.dataset.tab === tabName) {
-          panel.classList.add("active");
+          panel.classList.remove("hidden");
         } else {
-          panel.classList.remove("active");
+          panel.classList.add("hidden");
         }
       });
     });
@@ -391,16 +377,7 @@ function init() {
     }
   });
 
-  els.resetRun?.addEventListener("click", () => {
-    if (!confirm("Сбросить прогресс?")) return;
-    localStorage.removeItem(SAVE_KEY);
-    localStorage.removeItem("dark-path-prototype-save-v1");
-    combatAnimating = false;
-    setState(structuredClone(defaultState));
-    tutorialIndex = 0;
-    startTickLoop();
-    render();
-  });
+  // resetRun is now handled through the "reset" tab
 
   els.audioToggle?.addEventListener("click", async () => {
     await audio.toggleMusic(els.musicPlayer, els.audioToggle);

@@ -102,9 +102,9 @@ export function setSpeedMultiplier(v) {
   setFxSpeed(v);
 }
 
-function getSlotEmoji(item) {
-  if (item?.type?.visual && itemEmojis[item.type.visual]) return itemEmojis[item.type.visual];
-  return item ? slotEmojis[item.slot] || "⬡" : "⬡";
+function getSlotIcon(item) {
+  const slot = item ? item.slot : null;
+  return slot ? `./assets/equipment/${slot}.png` : '';
 }
 
 function getItemVisual(item) {
@@ -272,9 +272,10 @@ function renderLoot() {
     els.lootName.style.color = item.rarity.color;
   }
   if (els.lootIcon) {
-    els.lootIcon.className = "item-icon-emoji large";
-    els.lootIcon.textContent = getSlotEmoji(item);
-    els.lootIcon.style.cssText = `background: radial-gradient(circle, ${item.rarity.color}33, transparent 70%); border-color: ${item.rarity.color}55; text-shadow: 0 0 16px ${item.rarity.color}; font-size: 32px;`;
+    const iconSrc = `./assets/equipment/${item.slot}.png`;
+    els.lootIcon.className = 'item-icon-img large';
+    els.lootIcon.innerHTML = `<img src="${iconSrc}" alt="${item.type?.name || item.slot}" onerror="this.style.display='none'">`;
+    els.lootIcon.style.cssText = `border-color: ${item.rarity.color}55; box-shadow: 0 0 20px ${item.rarity.color}33;`;
   }
   if (els.lootRarityBadge) {
     els.lootRarityBadge.textContent = item.rarity.name;
@@ -290,13 +291,18 @@ function renderGear() {
   els.gearGrid.innerHTML = slots
     .map((slot) => {
       const item = state.inventory[slot.key];
-      const emoji = slotEmojis[slot.key] || "⬡";
+      const iconSrc = `./assets/equipment/${slot.key}.png`;
       if (!item) {
-        return `<div class="gear-slot empty"><div class="item-icon-emoji">${emoji}</div><div><span>${slot.name}</span><strong>пусто</strong></div></div>`;
+        return `<div class="gear-cell empty" title="${slot.name}: пусто">
+          <div class="gear-cell-icon"><img src="${iconSrc}" alt="${slot.name}" onerror="this.style.display='none'"></div>
+          <span class="gear-cell-label">${slot.name}</span>
+        </div>`;
       }
-      return `<div class="gear-slot" style="border-color:${item.rarity.color}55">
-        <div class="item-icon-emoji" style="background: radial-gradient(circle, ${item.rarity.color}22, transparent 70%); border-color: ${item.rarity.color}44">${getSlotEmoji(item)}</div>
-        <div><span>${slot.name}</span><strong style="color:${item.rarity.color}">${item.rarity.name} ${item.type?.name || slot.name}</strong><small>${formatItemStats(item)}</small></div>
+      return `<div class="gear-cell" style="--rarity-c:${item.rarity.color}" title="${item.rarity.name} ${item.type?.name || slot.name}\n${formatItemStats(item)}">
+        <div class="gear-cell-icon" style="border-color: ${item.rarity.color}66; box-shadow: 0 0 10px ${item.rarity.color}33">
+          <img src="${iconSrc}" alt="${item.type?.name || slot.name}" onerror="this.style.display='none'">
+        </div>
+        <span class="gear-cell-label" style="color:${item.rarity.color}">${slot.name}</span>
       </div>`;
     })
     .join("");

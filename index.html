@@ -2,264 +2,201 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Dark Path Prototype</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="app-shell">
-      <header class="topbar">
-        <div class="brand">
-          <span class="brand-mark"></span>
+
+      <!-- ═══ TOP: Location + Sector + Gold ═══ -->
+      <header class="game-header">
+        <div class="header-left">
+          <div class="class-icon" id="classBadge">⚔</div>
           <div>
-            <h1>Dark Path</h1>
-            <p>auto battle fantasy prototype</p>
+            <h2 id="locationName">Черный Лес</h2>
+            <div class="encounter-row" id="encounterPips"></div>
           </div>
         </div>
-        <div class="top-actions">
-          <button id="audioToggle" class="icon-button" type="button" title="Музыка">♪</button>
-          <button id="resetRun" class="ghost-button" type="button">Сброс</button>
+        <div class="header-right">
+          <div class="gold-chip"><span id="goldValue">0</span> G</div>
+          <div class="sector-chip">
+            <span id="sectorNumber">1</span>
+            <small>сектор</small>
+          </div>
         </div>
       </header>
 
-      <main class="game-layout">
-        <section class="stage-panel">
-          <div class="stage-sky">
-            <div class="moon"></div>
-            <div class="mist mist-a"></div>
-            <div class="mist mist-b"></div>
-            <div class="ruin ruin-left"></div>
-            <div class="ruin ruin-right"></div>
-            <div class="tree-line tree-line-left"></div>
-            <div class="tree-line tree-line-right"></div>
-            <div class="far-castle">
-              <span></span>
-              <span></span>
+      <!-- ═══ PROGRESS BAR ═══ -->
+      <div class="progress-line"><div id="sectorProgressBar"></div></div>
+
+      <!-- ═══ BATTLE SCENE ═══ -->
+      <section class="battle-section">
+        <div class="road-scene" id="roadScene">
+          <video id="locationVideo" class="location-video" autoplay muted loop playsinline></video>
+          <div class="road-scene-bg" id="roadSceneBg"></div>
+          <div class="road-lines"></div>
+          <div class="enemy-pack" id="enemyPack"></div>
+
+          <div class="enemy-stage" id="enemyStage">
+            <div class="enemy-nameplate">
+              <strong id="enemyName">Враг</strong>
+              <span id="enemyHpText">0 / 0</span>
+            </div>
+            <div class="hp-track enemy-track"><div id="enemyHpBar"></div></div>
+            <div class="enemy-traits" id="enemyTraits"></div>
+            <div class="portrait enemy-portrait" id="enemyPortrait">
+              <img id="enemyImage" class="enemy-img" alt="Enemy" />
+              <span class="enemy-silhouette"></span>
+            </div>
+          </div>
+
+          <div class="clash-column">
+            <div id="combatStatus" class="combat-status">Путь начинается</div>
+            <div id="starCharge" class="star-charge"></div>
+          </div>
+
+          <!-- Player hands -->
+          <div class="player-hands">
+            <div class="hand hand-left"></div>
+            <div class="talisman-orb" id="playerOffhand"></div>
+            <div class="hand hand-right"></div>
+            <div class="sword" id="playerWeapon">
               <span></span>
             </div>
           </div>
 
-          <div class="path-card">
-            <div class="location-row">
-              <div>
-                <p class="label">Локация</p>
-                <h2 id="locationName">Черный Лес</h2>
-              </div>
-              <div class="sector-chip">
-                <span id="sectorNumber">1</span>
-                <small>сектор</small>
-              </div>
-            </div>
-
-            <div class="progress-line">
-              <div id="sectorProgressBar"></div>
-            </div>
-            <div class="encounter-row" id="encounterPips"></div>
-          </div>
-
+          <!-- Game controls overlay -->
           <div class="game-controls">
-            <button id="audioToggle" class="icon-button" type="button" title="Музыка">♪</button>
-            <button id="pauseToggle" class="ghost-button small" type="button">Пауза</button>
-            <button id="speedToggle" class="ghost-button small speed-btn" type="button">1x</button>
-            <button id="resetRun" class="icon-button" type="button" title="Сброс">↻</button>
+            <button id="pauseToggle" class="ctrl-btn" type="button">⏸</button>
+            <button id="speedToggle" class="ctrl-btn speed-btn" type="button">1x</button>
+            <button id="audioToggle" class="ctrl-btn" type="button" title="Музыка">♪</button>
           </div>
-
-          <div class="battlefield first-person">
-            <div class="road-scene" id="roadScene">
-                <video id="locationVideo" class="location-video" autoplay muted loop playsinline></video>
-                <div class="road-scene-bg" id="roadSceneBg"></div>
-                <div class="road-lines"></div>
-                <div class="enemy-pack" id="enemyPack"></div>
-              <div class="enemy-stage" id="enemyStage">
-                <div class="enemy-nameplate">
-                  <strong id="enemyName">Враг</strong>
-                  <span id="enemyHpText">0 / 0</span>
-                </div>
-                <div class="hp-track enemy-track"><div id="enemyHpBar"></div></div>
-                <div class="enemy-traits" id="enemyTraits"></div>
-                <div class="portrait enemy-portrait" id="enemyPortrait">
-                  <img id="enemyImage" class="enemy-img" alt="Enemy" />
-                  <span class="enemy-silhouette"></span>
-                </div>
-              </div>
-
-              <div class="clash-column">
-                <div id="combatStatus" class="combat-status">Путь начинается</div>
-                <div id="starCharge" class="star-charge"></div>
-              </div>
-
-              <div class="hero-hud" id="heroHudFloat">
-                <div>
-                  <strong>Герой</strong>
-                  <span id="heroHpText">0 / 0</span>
-                </div>
-                <div class="hp-track"><div id="heroHpBar"></div></div>
-              </div>
-
-              <div class="player-hands">
-                <div class="hand hand-left">
-                  <div class="talisman-orb" id="playerOffhand"></div>
-                </div>
-                <div class="hand hand-right"></div>
-                <div class="sword" id="playerWeapon">
-                  <span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Карточка лута теперь здесь, чтобы быть поверх игры -->
-          <div class="loot-card hidden" id="lootCard">
-            <div class="loot-top">
-              <div id="lootIcon" class="item-icon large"></div>
-              <div>
-                <span class="label">Найдено снаряжение!</span>
-                <h3 id="lootName">Предмет</h3>
-                <p id="lootStats"></p>
-              </div>
-            </div>
-            <div id="lootCompare" class="loot-compare"></div>
-            <div class="swipe-hint">
-              <span>← Продать</span>
-              <span>Надеть →</span>
-            </div>
-          </div>
-
-          <div class="event-panel hidden" id="eventPanel">
-            <div>
-              <p class="label" id="eventKind">Событие</p>
-              <h3 id="eventTitle">Событие</h3>
-              <p id="eventText"></p>
-            </div>
-            <div class="event-actions" id="eventActions"></div>
-          </div>
-
-          <div class="log-panel">
-            <div class="log-header">
-              <span>Боевой журнал</span>
-              <div class="log-controls">
-                <button id="speedToggle" class="ghost-button small speed-btn" type="button">1x</button>
-                <button id="pauseToggle" class="ghost-button small" type="button">Пауза</button>
-              </div>
-            </div>
-            <div id="battleLog" class="battle-log"></div>
-          </div>
-        </section>
-
-        <div class="tabs-bar" id="tabsBar">
-          <button class="tab-button" data-tab="stats" type="button">Статистика</button>
-          <button class="tab-button" data-tab="loot" type="button">Лут</button>
-          <button class="tab-button" data-tab="artifacts" type="button">Артефакты</button>
         </div>
 
-        <aside class="side-panel hero-panel" data-tab="stats">
-          <div class="panel-head">
-            <div>
-              <p class="label">Персонаж</p>
-              <h2>Характеристики</h2>
+        <!-- Hero HP bar below battle -->
+        <div class="hero-bar">
+          <div class="hero-bar-inner">
+            <strong>Герой</strong>
+            <span id="heroHpText">0 / 0</span>
+          </div>
+          <div class="hp-track hero-track"><div id="heroHpBar"></div></div>
+        </div>
+      </section>
+
+      <!-- ═══ EVENT PANEL (overlay) ═══ -->
+      <div class="event-panel hidden" id="eventPanel">
+        <div>
+          <p class="label" id="eventKind">Событие</p>
+          <h3 id="eventTitle">Событие</h3>
+          <p id="eventText"></p>
+        </div>
+        <div class="event-actions" id="eventActions"></div>
+      </div>
+
+      <!-- ═══ LOOT CARD (overlay) ═══ -->
+      <div class="loot-card hidden" id="lootCard">
+        <div class="loot-top">
+          <div id="lootIcon" class="item-icon-img large"></div>
+          <div>
+            <span class="label">Найдено снаряжение!</span>
+            <h3 id="lootName">Предмет</h3>
+            <p id="lootStats"></p>
+          </div>
+        </div>
+        <div id="lootCompare" class="loot-compare"></div>
+        <div class="swipe-hint">
+          <span>← Продать</span>
+          <span>Надеть →</span>
+        </div>
+      </div>
+
+      <!-- ═══ EQUIPMENT GRID (always visible) ═══ -->
+      <section class="equip-section">
+        <div class="equip-header">
+          <span>Снаряжение</span>
+          <button id="openGearModal" class="ghost-button small" type="button">Подробнее</button>
+        </div>
+        <div id="gearGrid" class="gear-icon-grid"></div>
+      </section>
+
+      <!-- ═══ BOTTOM PANELS (tab content) ═══ -->
+      <section class="bottom-content" id="bottomContent">
+        <!-- Stats panel -->
+        <div class="tab-panel" data-tab="stats">
+          <div class="stats-compact">
+            <div class="level-row">
+              <div><span class="label">Улучшений</span><strong id="upgradeCount">0</strong></div>
+              <div><span class="label">Звезды</span><strong id="starCount">0</strong></div>
             </div>
-            <button class="close-panel-btn" type="button">✕</button>
-          </div>
-
-          <p class="class-badge-line">Класс: <strong id="classBadge">—</strong></p>
-
-          <div class="level-row">
-            <div>
-              <span class="label">Золото</span>
-              <strong id="goldValue">0</strong>
-            </div>
-            <div>
-              <span class="label">Улучшений</span>
-              <strong id="upgradeCount">0</strong>
-            </div>
-            <div>
-              <span class="label">Звезды</span>
-              <strong id="starCount">0</strong>
+            <div id="statsGrid" class="stats-grid"></div>
+            <div class="upgrade-box">
+              <button id="upgradeHero" class="primary-button" type="button">Улучшить героя</button>
+              <p id="upgradeCost">Стоимость: 0 G</p>
             </div>
           </div>
+        </div>
 
-          <div class="buff-section">
-            <span class="label">Баффы сектора</span>
-            <div id="buffBar" class="buff-bar"></div>
-          </div>
-
-          <div class="buff-section">
-            <span class="label">Синергии и сеты</span>
-            <div id="synergyBar" class="synergy-bar"></div>
-          </div>
-
-          <div id="statsGrid" class="stats-grid"></div>
-
-          <div class="upgrade-box">
-            <button id="upgradeHero" class="primary-button" type="button">Улучшить героя</button>
-            <p id="upgradeCost">Стоимость: 0 G</p>
-          </div>
-
-          <div class="artifacts-section">
-            <span class="label">Артефакты</span>
-            <div id="artifactsList" class="artifacts-list"></div>
-            <small class="hint-text">Пассивные бонусы. Нажми на модальное окно экипировки.</small>
-          </div>
-
+        <!-- Souls/Boss panel -->
+        <div class="tab-panel hidden" data-tab="souls">
           <div class="boss-box">
             <div class="souls">
-              <div>
-                <span>Рай (+HP, точность)</span>
-                <strong id="heavenSouls">0 / 5</strong>
-              </div>
-              <div>
-                <span>Ад (+урон, кровь)</span>
-                <strong id="hellSouls">0 / 5</strong>
-              </div>
+              <div><span>Рай (+HP, точность)</span><strong id="heavenSouls">0 / 5</strong></div>
+              <div><span>Ад (+урон, кровь)</span><strong id="hellSouls">0 / 5</strong></div>
             </div>
             <div class="boss-actions">
               <button id="summonHeaven" type="button">Босс Рая</button>
               <button id="summonHell" type="button">Босс Ада</button>
             </div>
           </div>
-        </aside>
-
-        <aside class="side-panel loot-panel" data-tab="loot">
-          <div class="panel-head">
-            <div>
-              <p class="label">Добыча</p>
-              <h2>Снаряжение</h2>
-            </div>
-            <button class="close-panel-btn" type="button">✕</button>
+          <div class="buff-section">
+            <span class="label">Баффы сектора</span>
+            <div id="buffBar" class="buff-bar"></div>
           </div>
-
-          <div class="gear-action">
-            <button id="openGearModal" class="primary-button" type="button">Снаряжение</button>
+          <div class="buff-section">
+            <span class="label">Синергии и сеты</span>
+            <div id="synergyBar" class="synergy-bar"></div>
           </div>
+        </div>
 
-          <div class="drop-panel">
-            <div class="drop-head">
-              <span>Шансы лута</span>
-              <small id="dropSectorText">Сектор 1</small>
-            </div>
-            <div id="dropChances" class="drop-chances"></div>
-          </div>
-        </aside>
+        <!-- Log panel -->
+        <div class="tab-panel hidden" data-tab="log">
+          <div id="battleLog" class="battle-log"></div>
+        </div>
 
-        <aside class="side-panel artifacts-panel" data-tab="artifacts">
-          <div class="panel-head">
-            <div>
-              <p class="label">Артефакты</p>
-              <h2>Пассивные бонусы</h2>
-            </div>
-            <button class="close-panel-btn" type="button">✕</button>
-          </div>
+        <!-- Artifacts panel -->
+        <div class="tab-panel hidden" data-tab="artifacts">
           <div id="artifactsList" class="artifacts-list"></div>
-          <small class="hint-text">Пассивные бонусы. Нажми на модальное окно экипировки.</small>
-        </aside>
-      </main>
+          <small class="hint-text">Пассивные бонусы от побед над боссами.</small>
+        </div>
+      </section>
+
+      <!-- ═══ BOTTOM TAB BAR ═══ -->
+      <nav class="bottom-tabs" id="tabsBar">
+        <button class="tab-btn active" data-tab="stats" type="button">
+          <span class="tab-icon">📊</span>
+          <span>Статы</span>
+        </button>
+        <button class="tab-btn" data-tab="souls" type="button">
+          <span class="tab-icon">👻</span>
+          <span>Души</span>
+        </button>
+        <button class="tab-btn" data-tab="log" type="button">
+          <span class="tab-icon">📜</span>
+          <span>Журнал</span>
+        </button>
+        <button class="tab-btn" data-tab="artifacts" type="button">
+          <span class="tab-icon">🏆</span>
+          <span>Артефакты</span>
+        </button>
+        <button class="tab-btn" data-tab="reset" type="button">
+          <span class="tab-icon">⚙️</span>
+          <span>Сброс</span>
+        </button>
+      </nav>
     </div>
 
-    <div id="milestoneToast" class="milestone-toast" aria-live="polite">
-      <strong class="milestone-title"></strong>
-      <p class="milestone-text"></p>
-    </div>
-
+    <!-- Modals -->
     <div id="classOverlay" class="game-overlay">
       <div class="overlay-card wide">
         <p class="label">Выбор пути</p>
@@ -289,6 +226,11 @@
         </div>
         <div id="gearGrid" class="gear-grid modal-grid"></div>
       </div>
+    </div>
+
+    <div id="milestoneToast" class="milestone-toast" aria-live="polite">
+      <strong class="milestone-title"></strong>
+      <p class="milestone-text"></p>
     </div>
 
     <audio id="musicPlayer" loop preload="none">
