@@ -95,6 +95,13 @@ export function bindElements() {
     "openGearModal",
     "closeGearModal",
     "artifactsList",
+    "itemDetailsOverlay",
+    "detailSlotName",
+    "closeItemDetails",
+    "detailIcon",
+    "detailName",
+    "detailLevel",
+    "detailStats",
   ].forEach((id) => {
     els[id] = document.getElementById(id);
   });
@@ -379,7 +386,7 @@ function renderLoot() {
     els.lootRarityBadge.style.borderColor = item.rarity.color;
     els.lootRarityBadge.style.color = item.rarity.color;
   }
-  if (els.lootStats) els.lootStats.textContent = `${item.slotName}: ${formatItemStats(item)}. Продажа: ${item.value} G`;
+  if (els.lootStats) els.lootStats.innerHTML = `<span style="color:var(--gold); font-weight:bold;">УР. ${item.level}</span> • ${item.slotName}. Продажа: ${item.value} G`;
   if (els.lootCompare) els.lootCompare.innerHTML = renderComparison(comparison, current);
 }
 
@@ -390,12 +397,12 @@ function renderGear() {
       const item = state.inventory[slot.key];
       const iconSrc = `./assets/equipment/${slot.key}.png`;
       if (!item) {
-        return `<div class="gear-cell empty" title="${slot.name}: пусто">
+        return `<div class="gear-cell empty" data-slot="${slot.key}" title="${slot.name}: пусто">
           <div class="gear-cell-icon"><img src="${iconSrc}" alt="${slot.name}" onerror="this.style.display='none'"></div>
           <span class="gear-cell-label">${slot.name}</span>
         </div>`;
       }
-      return `<div class="gear-cell" style="--rarity-c:${item.rarity.color}" title="${item.rarity.name} ${item.type?.name || slot.name}\n${formatItemStats(item)}">
+      return `<div class="gear-cell" data-slot="${slot.key}" style="--rarity-c:${item.rarity.color}">
         <div class="gear-cell-icon" style="border-color: ${item.rarity.color}66; box-shadow: 0 0 10px ${item.rarity.color}33">
           <img src="${iconSrc}" alt="${item.type?.name || slot.name}" onerror="this.style.display='none'">
         </div>
@@ -552,6 +559,47 @@ export function render() {
   if (els.summonHeaven) els.summonHeaven.disabled = state.heavenSouls < 5 || state.awaitingEvent;
   if (els.summonHell) els.summonHell.disabled = state.hellSouls < 5 || state.awaitingEvent;
   if (els.upgradeCost) els.upgradeCost.textContent = `Стоимость: ${upgradeCost()} G`;
+}
+
+export function showItemDetails(slotKey) {
+  const item = state.inventory[slotKey];
+  const slotData = slots.find((s) => s.key === slotKey);
+  if (!item) {
+    els.detailSlotName.textContent = slotData ? slotData.name : "Слот";
+    els.detailName.textContent = "Пусто";
+    els.detailLevel.textContent = "";
+    els.detailStats.innerHTML = "<p style='color: var(--dim);'>В этом слоте нет снаряжения.</p>";
+    els.detailIcon.innerHTML = `<img src="./assets/equipment/${slotKey}.png" alt="Пусто" onerror="this.style.display='none'" style="opacity: 0.3; filter: grayscale(1);">`;
+    els.detailIcon.style.borderColor = "var(--line)";
+    els.detailIcon.style.boxShadow = "none";
+    els.itemDetailsOverlay?.classList.remove("hidden");
+    return;
+  }
+  
+  els.detailSlotName.textContent = slotData ? slotData.name : "Снаряжение";
+  els.detailName.textContent = item.name;
+  els.detailName.style.color = item.rarity.color;
+  els.detailLevel.textContent = `УР. ${item.level || 1} • ${item.rarity.name}`;
+  els.detailLevel.style.color = item.rarity.color;
+  
+  els.detailIcon.innerHTML = `<img src="./assets/equipment/${slotKey}.png" alt="${item.name}" onerror="this.style.display='none'">`;
+  els.detailIcon.style.borderColor = `${item.rarity.color}66`;
+  els.detailIcon.style.boxShadow = `0 0 10px ${item.rarity.color}33`;
+  
+  els.detailStats.innerHTML = Object.entries(item.stats)
+    .map(([key, value]) => {
+      const label = statLabels[key] || key;
+      const formatted = formatStatValue(key, value, true);
+      return `<div style="display: flex; justify-content: space-between; font-size: 13px;">
+        <span style="color: var(--muted);">${label}</span>
+        <strong style="color: var(--gold);">${formatted}</strong>
+      </div>`;
+    })
+    .join("");
+    
+  els.itemDetailsOverlay?.classList.remove("hidden");
+}
+
   if (els.upgradeHero) els.upgradeHero.disabled = state.gold < upgradeCost();
   if (els.rerollLoot) els.rerollLoot.disabled = !state.pendingLoot || state.gold < rerollCost();
   if (els.rerollCost) els.rerollCost.textContent = `Перековка: ${rerollCost()} G`;

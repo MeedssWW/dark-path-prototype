@@ -1,15 +1,15 @@
 export const SAVE_KEY = "dark-path-prototype-save-v2";
 
 export const rarities = [
-  { key: "common", name: "Обычный", color: "#b8b8aa", power: 1, value: 18 },
-  { key: "uncommon", name: "Необычный", color: "#73d27a", power: 1.35, value: 38 },
-  { key: "rare", name: "Редкий", color: "#62a8ff", power: 1.8, value: 75 },
-  { key: "epic", name: "Эпический", color: "#b16dff", power: 2.45, value: 140 },
-  { key: "legendary", name: "Легендарный", color: "#ffb84d", power: 3.25, value: 260 },
-  { key: "mythic", name: "Мифический", color: "#ff5f8f", power: 4.15, value: 460 },
-  { key: "ancient", name: "Древний", color: "#53e2c5", power: 5.15, value: 780 },
-  { key: "divine", name: "Божественный", color: "#f8f1a8", power: 6.35, value: 1280 },
-  { key: "relic", name: "Реликвия", color: "#ffffff", power: 8, value: 2200 },
+  { key: "common", name: "Обычный", color: "#b8b8aa", power: 1, value: 18, stats: 1 },
+  { key: "uncommon", name: "Необычный", color: "#73d27a", power: 1.35, value: 38, stats: 2 },
+  { key: "rare", name: "Редкий", color: "#62a8ff", power: 1.8, value: 75, stats: 3 },
+  { key: "epic", name: "Эпический", color: "#b16dff", power: 2.45, value: 140, stats: 4 },
+  { key: "legendary", name: "Легендарный", color: "#ffb84d", power: 3.25, value: 260, stats: 5 },
+  { key: "mythic", name: "Мифический", color: "#ff5f8f", power: 4.15, value: 460, stats: 6 },
+  { key: "ancient", name: "Древний", color: "#53e2c5", power: 5.15, value: 780, stats: 7 },
+  { key: "divine", name: "Божественный", color: "#f8f1a8", power: 6.35, value: 1280, stats: 8 },
+  { key: "relic", name: "Реликвия", color: "#ffffff", power: 8, value: 2200, stats: 9 },
 ];
 
 export const slots = [
@@ -237,19 +237,13 @@ export const milestoneDefs = [
 export const itemTypes = {
   weapon: [
     { key: "sword", name: "меч", visual: "sword" },
-    { key: "mace", name: "булава", visual: "mace" },
     { key: "axe", name: "топор", visual: "axe" },
-    { key: "spear", name: "копье", visual: "spear" },
     { key: "dagger", name: "кинжал", visual: "dagger" },
-    { key: "staff", name: "посох", visual: "staff" },
-    { key: "katana", name: "катана", visual: "katana" },
     { key: "scythe", name: "коса", visual: "scythe" },
   ],
   talisman: [
     { key: "orb", name: "сфера", visual: "orb" },
-    { key: "relic", name: "реликт", visual: "relic" },
     { key: "tome", name: "книга", visual: "tome" },
-    { key: "idol", name: "идол", visual: "idol" },
     { key: "skull", name: "череп", visual: "skull" },
     { key: "crystal", name: "кристалл", visual: "crystal" },
   ],
@@ -258,13 +252,11 @@ export const itemTypes = {
     { key: "crown", name: "корона", visual: "crown" },
     { key: "hood", name: "капюшон", visual: "hood" },
     { key: "bone_mask", name: "костяная маска", visual: "bone_mask" },
-    { key: "horned_helm", name: "рогатый шлем", visual: "horned_helm" },
   ],
   chest: [
     { key: "plate", name: "латы", visual: "plate" },
     { key: "chainmail", name: "кольчуга", visual: "chainmail" },
     { key: "robe", name: "мантия", visual: "robe" },
-    { key: "leather", name: "кожаный доспех", visual: "leather" },
     { key: "dragon_scale", name: "чешуя дракона", visual: "dragon_scale" },
   ],
   boots: [

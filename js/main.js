@@ -405,6 +405,26 @@ function init() {
     }
   });
 
+  els.closeItemDetails?.addEventListener("click", () => {
+    els.itemDetailsOverlay?.classList.add("hidden");
+  });
+  els.itemDetailsOverlay?.addEventListener("click", (e) => {
+    if (e.target === els.itemDetailsOverlay) {
+      els.itemDetailsOverlay.classList.add("hidden");
+    }
+  });
+
+  // Event delegation for gear-cell clicks
+  document.addEventListener("click", (e) => {
+    const gearCell = e.target.closest(".gear-cell");
+    if (gearCell && gearCell.dataset.slot) {
+      const slotKey = gearCell.dataset.slot;
+      import("./render.js").then(({ showItemDetails }) => {
+        showItemDetails(slotKey);
+      });
+    }
+  });
+
   // resetRun is now handled through the "reset" tab
 
   els.audioToggle?.addEventListener("click", async () => {

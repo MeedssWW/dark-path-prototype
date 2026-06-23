@@ -117,7 +117,7 @@
       </div>
 
       <!-- ═══ EQUIPMENT GRID (always visible) ═══ -->
-      <section class="equip-section">
+      <section class="equip-section" style="padding-bottom: 80px;">
         <div class="equip-header">
           <span>Снаряжение</span>
           <button id="openGearModal" class="ghost-button small" type="button">Подробнее</button>
@@ -235,6 +235,23 @@
           <button id="closeGearModal" class="close-button" type="button">✕</button>
         </div>
         <div id="gearGrid" class="gear-grid modal-grid"></div>
+      </div>
+    </div>
+
+    <div id="itemDetailsOverlay" class="game-overlay hidden">
+      <div class="overlay-card">
+        <div class="modal-header">
+          <p class="label" id="detailSlotName">Слот</p>
+          <button id="closeItemDetails" class="close-button" type="button">✕</button>
+        </div>
+        <div class="loot-top" style="margin-top: 12px; display: flex; gap: 12px; align-items: flex-start;">
+          <div id="detailIcon" class="item-icon-img large" style="width: 64px; height: 64px;"></div>
+          <div>
+            <h3 id="detailName" style="margin: 0 0 4px 0; font-size: 16px; color: var(--text);">Предмет</h3>
+            <p id="detailLevel" style="font-size: 12px; color: var(--dim); font-weight: 800; margin: 0 0 8px 0; text-transform: uppercase;">Ур. 1</p>
+            <div id="detailStats" style="display: flex; flex-direction: column; gap: 4px;"></div>
+          </div>
+        </div>
       </div>
     </div>
 

@@ -76,21 +76,48 @@ export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) 
   const slot = slots[Math.floor(Math.random() * slots.length)];
   const type = rollItemType(slot.key);
   const rarity = rollRarity(state.sector + (forceBoss ? 18 : 0), bonusLuck, lootBias);
-  const mainStat = slot.stats[Math.floor(Math.random() * slot.stats.length)];
-  const secondaryStat = slot.stats.find((stat) => stat !== mainStat) || mainStat;
-  const power = rarity.power * (1 + state.sector * 0.055) * (forceBoss ? 1.25 : 1);
+  
+  const baseLevel = state.sector * 10;
+  const levelVariance = Math.floor(Math.random() * 5);
+  const itemLevel = Math.max(1, baseLevel + levelVariance);
+  
+  const power = rarity.power * (itemLevel / 10 + 1) * (forceBoss ? 1.25 : 1);
+  
   const item = {
     id: crypto.randomUUID(),
     slot: slot.key,
     slotName: slot.name,
     type,
     rarity,
+    level: itemLevel,
     name: `${rarity.name} ${type.name} ${nameSuffix()}`,
-    value: Math.round(rarity.value * (1 + state.sector * 0.05)),
+    value: Math.round(rarity.value * (itemLevel / 5 + 1)),
     stats: {},
   };
-  item.stats[mainStat] = statRoll(mainStat, power, true);
-  item.stats[secondaryStat] = (item.stats[secondaryStat] || 0) + statRoll(secondaryStat, power, false);
+  
+  const allStats = ["damage", "health", "armor", "accuracy", "combo", "crit", "evasion", "lifeSteal", "bleed"];
+  const chosenStats = [];
+  
+  // First pick slot-specific stats
+  for (const s of slot.stats) {
+    if (chosenStats.length < rarity.stats) {
+      chosenStats.push(s);
+    }
+  }
+  
+  // If we need more stats, pick from the remaining pool
+  const remainingPool = allStats.filter(s => !chosenStats.includes(s));
+  while (chosenStats.length < rarity.stats && remainingPool.length > 0) {
+    const idx = Math.floor(Math.random() * remainingPool.length);
+    chosenStats.push(remainingPool[idx]);
+    remainingPool.splice(idx, 1);
+  }
+  
+  chosenStats.forEach((stat, index) => {
+    const isMajor = index === 0; // First stat is major
+    item.stats[stat] = statRoll(stat, power, isMajor);
+  });
+  
   return item;
 }
 
