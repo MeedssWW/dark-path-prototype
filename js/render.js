@@ -111,7 +111,7 @@ function processChromaKey(src) {
   
   return new Promise((resolve) => {
     const img = new Image();
-    img.crossOrigin = "Anonymous";
+    // Do NOT set crossOrigin, since we are on the same domain it causes CORS cache poisoning on GH Pages
     img.onload = () => {
       const canvas = document.createElement("canvas");
       canvas.width = img.width;
@@ -125,12 +125,10 @@ function processChromaKey(src) {
           let r = data[i], g = data[i+1], b = data[i+2];
           // Detect strong green: Green is dominant
           if (g > 120 && r < 120 && b < 120 && g > r * 1.5 && g > b * 1.5) {
-            // Compute how "pure" the green is
             let maxOther = Math.max(r, b);
             if (g > maxOther + 40) {
               data[i+3] = 0; // Fully transparent
             } else {
-              // Partial transparency for edge blending
               data[i+3] = Math.max(0, 255 - (g - maxOther) * 3);
             }
           }
@@ -150,16 +148,17 @@ function processChromaKey(src) {
 }
 
 function loadFpAssets() {
-  processChromaKey("./assets/first_person/left_arm.png").then(url => {
-    if(els.realLeftArm) { els.realLeftArm.src = url; els.realLeftArm.style.display = 'block'; }
+  const v = Date.now(); // Cache buster
+  processChromaKey(`./assets/first_person/left_arm.png?v=${v}`).then(url => {
+    if(els.realLeftArm) { els.realLeftArm.src = url; }
   });
-  processChromaKey("./assets/first_person/right_arm.png").then(url => {
-    if(els.realRightArm) { els.realRightArm.src = url; els.realRightArm.style.display = 'block'; }
+  processChromaKey(`./assets/first_person/right_arm.png?v=${v}`).then(url => {
+    if(els.realRightArm) { els.realRightArm.src = url; }
   });
-  processChromaKey("./assets/first_person/sword.png").then(url => {
+  processChromaKey(`./assets/first_person/sword.png?v=${v}`).then(url => {
     if(els.playerWeaponImg) { els.playerWeaponImg.src = url; }
   });
-  processChromaKey("./assets/first_person/talisman.png").then(url => {
+  processChromaKey(`./assets/first_person/talisman.png?v=${v}`).then(url => {
     if(els.playerOffhandImg) { els.playerOffhandImg.src = url; }
   });
 }
