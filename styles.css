@@ -2766,8 +2766,15 @@ body[data-location="abyss"] .ruin-right {
   transition: width 0.3s ease;
 }
 
-.battle-section { position: relative; flex-shrink: 0; }
-.battle-section .road-scene { height: 360px; border: none; border-radius: 0; }
+.battle-section { position: relative; flex-shrink: 0; display: flex; flex-direction: column; }
+.battle-section .road-scene {
+  position: relative;
+  height: 380px;
+  inset: auto;
+  border: none;
+  border-radius: 0;
+}
+.battle-section .hand { bottom: -2px; }
 
 .game-controls {
   position: absolute; top: 8px; right: 8px; z-index: 12;
@@ -2851,6 +2858,14 @@ body[data-location="abyss"] .ruin-right {
 }
 .bottom-content.open {
   transform: translateX(-50%) translateY(0);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.tab-panel.hidden {
+  display: none !important;
 }
 
 .bottom-content-header {
