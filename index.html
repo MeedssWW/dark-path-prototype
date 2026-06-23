@@ -121,9 +121,14 @@
       </section>
 
       <!-- ═══ BOTTOM PANELS (tab content) ═══ -->
-      <section class="bottom-content" id="bottomContent">
+      <section class="bottom-content hidden-popup" id="bottomContent">
+        <div class="bottom-content-header">
+          <span id="bottomContentTitle">Информация</span>
+          <button id="closeBottomContent" class="close-button" type="button">✕</button>
+        </div>
+        
         <!-- Stats panel -->
-        <div class="tab-panel" data-tab="stats">
+        <div class="tab-panel hidden" data-tab="stats">
           <div class="stats-compact">
             <div class="level-row">
               <div><span class="label">Улучшений</span><strong id="upgradeCount">0</strong></div>
@@ -173,7 +178,7 @@
 
       <!-- ═══ BOTTOM TAB BAR ═══ -->
       <nav class="bottom-tabs" id="tabsBar">
-        <button class="tab-btn active" data-tab="stats" type="button">
+        <button class="tab-btn" data-tab="stats" type="button">
           <span class="tab-icon">📊</span>
           <span>Статы</span>
         </button>

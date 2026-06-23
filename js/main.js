@@ -332,7 +332,18 @@ function init() {
   // Setup bottom tab switching
   const tabButtons = document.querySelectorAll(".tab-btn");
   const tabPanels = document.querySelectorAll(".tab-panel");
-  
+  const bottomContent = document.getElementById("bottomContent");
+  const bottomContentTitle = document.getElementById("bottomContentTitle");
+  const closeBottomContent = document.getElementById("closeBottomContent");
+
+  function closePopup() {
+    tabButtons.forEach((b) => b.classList.remove("active"));
+    bottomContent.classList.add("hidden-popup");
+    bottomContent.classList.remove("open");
+  }
+
+  closeBottomContent?.addEventListener("click", closePopup);
+
   tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const tabName = btn.dataset.tab;
@@ -350,8 +361,25 @@ function init() {
         return;
       }
       
+      const isCurrentlyActive = btn.classList.contains("active");
+      
+      if (isCurrentlyActive) {
+        closePopup();
+        return;
+      }
+
       tabButtons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
+      
+      // Show popup
+      bottomContent.classList.remove("hidden-popup");
+      bottomContent.classList.add("open");
+      
+      // Update title based on span text inside button
+      const titleSpan = btn.querySelector("span:not(.tab-icon)");
+      if (bottomContentTitle && titleSpan) {
+        bottomContentTitle.textContent = titleSpan.textContent;
+      }
       
       tabPanels.forEach((panel) => {
         if (panel.dataset.tab === tabName) {
