@@ -312,6 +312,9 @@ function renderEvent() {
   event.choices.forEach((choice) => {
     const button = document.createElement("button");
     button.type = "button";
+    button.className = "ghost-button";
+    button.style.width = "100%";
+    button.style.marginBottom = "8px";
     button.textContent = choice.label;
     button.addEventListener("click", () => {
       runEventEffect(choice.effectKey, state);

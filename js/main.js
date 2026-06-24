@@ -257,37 +257,8 @@ function setupClassOverlay() {
   });
 }
 
-let tutorialIndex = 0;
-
 function setupTutorial() {
-  const nextBtn = document.getElementById("tutorialNext");
-  const skipBtn = document.getElementById("tutorialSkip");
-  const update = () => {
-    const step = tutorialSteps[tutorialIndex];
-    const title = document.getElementById("tutorialTitle");
-    const text = document.getElementById("tutorialText");
-    const progress = document.getElementById("tutorialProgress");
-    if (title) title.textContent = step.title;
-    if (text) text.textContent = step.text;
-    if (progress) progress.textContent = `${tutorialIndex + 1} / ${tutorialSteps.length}`;
-    if (nextBtn) nextBtn.textContent = tutorialIndex >= tutorialSteps.length - 1 ? "В бой" : "Далее";
-  };
-  nextBtn?.addEventListener("click", () => {
-    if (tutorialIndex >= tutorialSteps.length - 1) {
-      state.tutorialDone = true;
-      saveState();
-      render();
-      return;
-    }
-    tutorialIndex += 1;
-    update();
-  });
-  skipBtn?.addEventListener("click", () => {
-    state.tutorialDone = true;
-    saveState();
-    render();
-  });
-  update();
+  state.tutorialDone = true;
 }
 
 function upgradeHero() {
