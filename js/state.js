@@ -104,7 +104,7 @@ export function normalizeState(s) {
   if (!s.stats) s.stats = { heavenBosses: 0, hellBosses: 0, epicSlots: 0 };
   
   // Recover from broken intro state
-  if (s.heroClass && (!s.storyFlags || !s.storyFlags.intro_done)) {
+  if (s.heroClass && !s.awaitingEvent && (!s.storyFlags || !s.storyFlags.intro_done)) {
     s.heroClass = null;
     s.awaitingEvent = false;
   }

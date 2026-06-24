@@ -212,6 +212,7 @@ function showActTitle() {
 
 function finishAwakening() {
   state.awaitingEvent = false;
+  if (!state.storyFlags) state.storyFlags = {};
   state.storyFlags.intro_done = true;
   saveState();
   render();
