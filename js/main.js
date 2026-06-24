@@ -128,11 +128,16 @@ function startCinematic(classKey) {
   renderCinematicSlide();
 }
 
+let cinematicTimeout1;
+let cinematicTimeout2;
+
 function renderCinematicSlide() {
   const overlay = document.getElementById("cinematicOverlay");
+  const blink = document.getElementById("cinematicBlink");
   const img = document.getElementById("cinematicImage");
   const vid = document.getElementById("cinematicVideo");
   const textEl = document.getElementById("cinematicText");
+  const nextBtn = document.getElementById("cinematicNext");
 
   if (!overlay) return;
 
@@ -144,7 +149,15 @@ function renderCinematicSlide() {
     return;
   }
 
+  clearTimeout(cinematicTimeout1);
+  clearTimeout(cinematicTimeout2);
+  
   overlay.classList.remove("hidden");
+  blink.style.opacity = "1"; // Eyes closed
+  textEl.style.opacity = "0";
+  nextBtn.style.opacity = "0";
+  nextBtn.classList.add("hidden");
+
   const slide = cinematicSlides[currentSlideIndex];
   textEl.textContent = slide.text;
 
@@ -159,6 +172,18 @@ function renderCinematicSlide() {
     vid.style.display = "block";
     vid.play();
   }
+
+  // 1) Open eyes (0.5s delay)
+  cinematicTimeout1 = setTimeout(() => {
+    blink.style.opacity = "0";
+    
+    // 2) Show text and button (2s after eyes open)
+    cinematicTimeout2 = setTimeout(() => {
+      textEl.style.opacity = "1";
+      nextBtn.classList.remove("hidden");
+      setTimeout(() => { nextBtn.style.opacity = "1"; }, 50);
+    }, 2000);
+  }, 500);
 }
 
 function showActTitle() {
@@ -194,10 +219,14 @@ function finishAwakening() {
 // Hook up cinematic next button
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("cinematicNext");
+  const blink = document.getElementById("cinematicBlink");
   if (btn) {
     btn.addEventListener("click", () => {
-      currentSlideIndex++;
-      renderCinematicSlide();
+      if (blink) blink.style.opacity = "1"; // Eyes close
+      setTimeout(() => {
+        currentSlideIndex++;
+        renderCinematicSlide();
+      }, 1000); // 1s wait for fade to black
     });
   }
 });
