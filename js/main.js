@@ -133,7 +133,8 @@ let cinematicTimeout2;
 
 function renderCinematicSlide() {
   const overlay = document.getElementById("cinematicOverlay");
-  const blink = document.getElementById("cinematicBlink");
+  const eyelidTop = document.getElementById("eyelidTop");
+  const eyelidBottom = document.getElementById("eyelidBottom");
   const img = document.getElementById("cinematicImage");
   const vid = document.getElementById("cinematicVideo");
   const textEl = document.getElementById("cinematicText");
@@ -153,7 +154,8 @@ function renderCinematicSlide() {
   clearTimeout(cinematicTimeout2);
   
   overlay.classList.remove("hidden");
-  blink.style.opacity = "1"; // Eyes closed
+  eyelidTop.style.height = "50%"; // Eyes closed
+  eyelidBottom.style.height = "50%";
   textEl.style.opacity = "0";
   nextBtn.style.opacity = "0";
   nextBtn.classList.add("hidden");
@@ -175,7 +177,8 @@ function renderCinematicSlide() {
 
   // 1) Open eyes (0.5s delay)
   cinematicTimeout1 = setTimeout(() => {
-    blink.style.opacity = "0";
+    eyelidTop.style.height = "0%";
+    eyelidBottom.style.height = "0%";
     
     // 2) Show text and button (2s after eyes open)
     cinematicTimeout2 = setTimeout(() => {
@@ -219,14 +222,16 @@ function finishAwakening() {
 // Hook up cinematic next button
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("cinematicNext");
-  const blink = document.getElementById("cinematicBlink");
+  const eyelidTop = document.getElementById("eyelidTop");
+  const eyelidBottom = document.getElementById("eyelidBottom");
   if (btn) {
     btn.addEventListener("click", () => {
-      if (blink) blink.style.opacity = "1"; // Eyes close
+      if (eyelidTop) eyelidTop.style.height = "50%"; // Eyes close
+      if (eyelidBottom) eyelidBottom.style.height = "50%";
       setTimeout(() => {
         currentSlideIndex++;
         renderCinematicSlide();
-      }, 1000); // 1s wait for fade to black
+      }, 800); // wait for fade to black
     });
   }
 });
