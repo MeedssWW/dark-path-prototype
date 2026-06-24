@@ -2904,7 +2904,7 @@ body[data-location="abyss"] .ruin-right {
 
 /* New real hands */
 .player-hands {
-  position: absolute; inset: 0; pointer-events: none; z-index: 10;
+  position: fixed; inset: 0; pointer-events: none; z-index: 10;
 }
 .real-hand-left {
   position: absolute; bottom: -60px; left: -40px;
@@ -3099,7 +3099,7 @@ body[data-location="abyss"] .ruin-right {
 
 /* New real hands */
 .player-hands {
-  position: absolute; inset: 0; pointer-events: none; z-index: 10;
+  position: fixed; inset: 0; pointer-events: none; z-index: 10;
 }
 .real-hand-left {
   position: absolute; bottom: -20px; left: -20px;
