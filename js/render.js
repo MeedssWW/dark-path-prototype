@@ -393,7 +393,8 @@ function renderLoot() {
     els.lootName.style.color = item.rarity.color;
   }
   if (els.lootIcon) {
-    const iconSrc = `./assets/equipment/${item.slot}.png`;
+    const iconKey = item.type?.visual || item.slot;
+    const iconSrc = `./assets/equipment/${iconKey}.png`;
     els.lootIcon.className = 'item-icon-img large';
     els.lootIcon.innerHTML = `<img src="${iconSrc}" alt="${item.type?.name || item.slot}" onerror="this.style.display='none'">`;
     els.lootIcon.style.cssText = `border-color: ${item.rarity.color}55; box-shadow: 0 0 20px ${item.rarity.color}33;`;
@@ -412,10 +413,11 @@ function renderGear() {
   els.gearGrid.innerHTML = slots
     .map((slot) => {
       const item = state.inventory[slot.key];
-      const iconSrc = `./assets/equipment/${slot.key}.png`;
+      const iconKey = item?.type?.visual || slot.key;
+      const iconSrc = `./assets/equipment/${iconKey}.png`;
       if (!item) {
-        return `<div class="gear-cell empty" data-slot="${slot.key}" title="${slot.name}: пусто">
-          <div class="gear-cell-icon"><img src="${iconSrc}" alt="${slot.name}" onerror="this.style.display='none'"></div>
+        return `<div class="gear-cell empty" data-slot="${slot.key}" title="${slot.name}: Пусто">
+          <div class="gear-cell-icon"><img src="./assets/equipment/${slot.key}.png" alt="${slot.name}" onerror="this.style.display='none'"></div>
           <span class="gear-cell-label">${slot.name}</span>
         </div>`;
       }

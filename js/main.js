@@ -103,7 +103,7 @@ let currentSlideIndex = 0;
 
 function startCinematic(classKey) {
   // Define sequence
-  if (classKey === "knight") {
+  if (classKey === "dark_knight") {
     cinematicSlides = [
       { type: "image", src: "assets/events/s2.png", text: "Засада на тракте... Я помню только крики, звон стали и сильный удар по шлему." },
       { type: "image", src: "assets/events/s3.png", text: "Мародеры перебили всех, но моя броня спасла мне жизнь. Мои люди мертвы, но приказ остается приказом." },
