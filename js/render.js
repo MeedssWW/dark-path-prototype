@@ -348,23 +348,33 @@ function renderStats(heroStats) {
 function renderHands() {
   const weapon = state.inventory.weapon;
   const offhand = state.inventory.talisman;
+  const cls = state.heroClass || "knight";
   
   // Hand rendering
+  const v = 27; // bump cache buster
+  
   if (els.realLeftArm) {
     els.realLeftArm.style.display = 'block';
+    const leftArmSrc = cls === "hunter" ? `./assets/first_person/left_arm_hunter.png?v=${v}` : `./assets/first_person/left_arm.png?v=${v}`;
+    processChromaKey(leftArmSrc).then(url => els.realLeftArm.src = url);
   }
-  // Weapon and Offhand
-  const v = 26;
-  
+
   if (els.realRightArm) {
     els.realRightArm.style.display = 'block';
-    let rightArmSrc = `./assets/first_person/right_arm.png?v=${v}`;
+    
+    // Default fallback is the base arm
+    let rightArmSrc = cls === "hunter" ? `./assets/first_person/right_arm_hunter.png?v=${v}` : `./assets/first_person/right_arm.png?v=${v}`;
+
     if (weapon) {
       const wKey = weapon.type.key;
+      // We only successfully generated hunter sword and dagger so far
+      const hasCustom = cls === "hunter" && (wKey === "sword" || wKey === "dagger");
+      const suffix = hasCustom ? `_hunter` : ``;
+      
       if (['sword', 'dagger', 'axe', 'scythe'].includes(wKey)) {
-        rightArmSrc = `./assets/first_person/right_arm_${wKey}.png?v=${v}`;
+        rightArmSrc = `./assets/first_person/right_arm_${wKey}${suffix}.png?v=${v}`;
       } else {
-        rightArmSrc = `./assets/first_person/right_arm_sword.png?v=${v}`; // Fallback generic weapon grip
+        rightArmSrc = `./assets/first_person/right_arm_sword${suffix}.png?v=${v}`; 
       }
     }
     processChromaKey(rightArmSrc).then(url => els.realRightArm.src = url);
