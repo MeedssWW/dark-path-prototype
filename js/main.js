@@ -138,7 +138,7 @@ function renderCinematicSlide() {
   const img = document.getElementById("cinematicImage");
   const vid = document.getElementById("cinematicVideo");
   const textEl = document.getElementById("cinematicText");
-  const nextBtn = document.getElementById("cinematicNext");
+  const nextHint = document.getElementById("cinematicNextHint");
 
   if (!overlay) return;
 
@@ -157,8 +157,7 @@ function renderCinematicSlide() {
   eyelidTop.style.height = "50%"; // Eyes closed
   eyelidBottom.style.height = "50%";
   textEl.style.opacity = "0";
-  nextBtn.style.opacity = "0";
-  nextBtn.classList.add("hidden");
+  if (nextHint) nextHint.style.opacity = "0";
 
   const slide = cinematicSlides[currentSlideIndex];
   textEl.textContent = slide.text;
@@ -180,11 +179,10 @@ function renderCinematicSlide() {
     eyelidTop.style.height = "0%";
     eyelidBottom.style.height = "0%";
     
-    // 2) Show text and button (2s after eyes open)
+    // 2) Show text and hint (2s after eyes open)
     cinematicTimeout2 = setTimeout(() => {
       textEl.style.opacity = "1";
-      nextBtn.classList.remove("hidden");
-      setTimeout(() => { nextBtn.style.opacity = "1"; }, 50);
+      if (nextHint) nextHint.style.opacity = "1";
     }, 2000);
   }, 500);
 }
@@ -219,13 +217,16 @@ function finishAwakening() {
   render();
 }
 
-// Hook up cinematic next button
+// Hook up cinematic click to continue
 document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("cinematicNext");
+  const overlay = document.getElementById("cinematicOverlay");
+  const nextHint = document.getElementById("cinematicNextHint");
   const eyelidTop = document.getElementById("eyelidTop");
   const eyelidBottom = document.getElementById("eyelidBottom");
-  if (btn) {
-    btn.addEventListener("click", () => {
+  if (overlay) {
+    overlay.addEventListener("click", () => {
+      // Only allow click if hint is visible
+      if (!nextHint || nextHint.style.opacity !== "1") return;
       if (eyelidTop) eyelidTop.style.height = "50%"; // Eyes close
       if (eyelidBottom) eyelidBottom.style.height = "50%";
       setTimeout(() => {
