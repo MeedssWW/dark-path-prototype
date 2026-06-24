@@ -125,6 +125,9 @@ function startCinematic(classKey) {
 
   currentSlideIndex = 0;
   state.awaitingEvent = true; // block game loop
+  if (!state.storyFlags) state.storyFlags = {};
+  state.storyFlags.intro_done = false; // ensure it doesn't auto-recover from a corrupted save
+  saveState();
   renderCinematicSlide();
 }
 
