@@ -651,3 +651,15 @@ export function showItemDetails(slotKey) {
     
   els.itemDetailsOverlay?.classList.remove("hidden");
 }
+
+export function triggerHeroAttackAnim() {
+  if (els.realRightArm) {
+    els.realRightArm.classList.remove('attacking-right-arm');
+    void els.realRightArm.offsetWidth; // trigger reflow
+    els.realRightArm.classList.add('attacking-right-arm');
+    setTimeout(() => {
+      if (els.realRightArm) els.realRightArm.classList.remove('attacking-right-arm');
+    }, 450);
+  }
+}
+

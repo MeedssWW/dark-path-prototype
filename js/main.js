@@ -20,7 +20,7 @@ import {
 } from "./combat.js";
 import { equipPendingLoot, sellPendingLoot, rerollPendingLoot } from "./loot.js";
 import { audio } from "./audio.js";
-import { bindElements, render, els, setCombatStatus, setSpeedMultiplier } from "./render.js?v=21";
+import { bindElements, render, els, setCombatStatus, setSpeedMultiplier, triggerHeroAttackAnim } from "./render.js?v=22";
 import { getSpeedMultiplier } from "./fx.js";
 import { getAliveEnemies } from "./state.js";
 import { checkMilestones } from "./milestones.js";
@@ -66,6 +66,7 @@ async function combatTick() {
       return;
     }
 
+    triggerHeroAttackAnim();
     await playCombatPhase("hero-attack", "Атака героя", 420);
     heroAttack(heroStats);
     saveState();
