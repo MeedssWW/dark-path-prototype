@@ -354,7 +354,7 @@ function renderHands() {
     els.realLeftArm.style.display = 'block';
   }
   // Weapon and Offhand
-  const v = 25;
+  const v = 26;
   
   if (els.realRightArm) {
     els.realRightArm.style.display = 'block';
