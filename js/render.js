@@ -476,7 +476,7 @@ export function updateOverlays() {
   els.classOverlay?.classList.toggle("hidden", !needClass);
   els.tutorialOverlay?.classList.toggle("hidden", !needTutorial);
 
-  const appContainer = document.getElementById("app");
+  const appContainer = document.querySelector(".app-shell");
   if (appContainer) {
     if (!state.storyFlags?.intro_done) {
       appContainer.style.display = "none";
