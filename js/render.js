@@ -358,10 +358,11 @@ function renderHands() {
   }
 
   // Weapon and Offhand
+  const v = 8;
   if (els.playerWeaponImg) {
     if (weapon) {
       els.playerWeaponImg.style.display = 'block';
-      els.playerWeaponImg.src = `./assets/equipment/${weapon.type.key}.png`;
+      processChromaKey(`./assets/first_person/sword.png?v=${v}`).then(url => els.playerWeaponImg.src = url);
     } else {
       els.playerWeaponImg.style.display = 'none';
     }
@@ -369,7 +370,7 @@ function renderHands() {
   if (els.playerOffhandImg) {
     if (offhand) {
       els.playerOffhandImg.style.display = 'block';
-      els.playerOffhandImg.src = `./assets/equipment/${offhand.type.key}.png`;
+      processChromaKey(`./assets/first_person/talisman.png?v=${v}`).then(url => els.playerOffhandImg.src = url);
     } else {
       els.playerOffhandImg.style.display = 'none';
     }
