@@ -351,11 +351,11 @@ function renderHands() {
   const cls = state.heroClass || "knight";
   
   // Hand rendering
-  const v = 27; // bump cache buster
+  const v = 28; // bump cache buster
   
   if (els.realLeftArm) {
     els.realLeftArm.style.display = 'block';
-    const leftArmSrc = cls === "hunter" ? `./assets/first_person/left_arm_hunter.png?v=${v}` : `./assets/first_person/left_arm.png?v=${v}`;
+    const leftArmSrc = cls === "knight" ? `./assets/first_person/left_arm.png?v=${v}` : `./assets/first_person/left_arm_${cls}.png?v=${v}`;
     processChromaKey(leftArmSrc).then(url => els.realLeftArm.src = url);
   }
 
@@ -363,13 +363,11 @@ function renderHands() {
     els.realRightArm.style.display = 'block';
     
     // Default fallback is the base arm
-    let rightArmSrc = cls === "hunter" ? `./assets/first_person/right_arm_hunter.png?v=${v}` : `./assets/first_person/right_arm.png?v=${v}`;
+    let rightArmSrc = cls === "knight" ? `./assets/first_person/right_arm.png?v=${v}` : `./assets/first_person/right_arm_${cls}.png?v=${v}`;
 
     if (weapon) {
       const wKey = weapon.type.key;
-      // We only successfully generated hunter sword and dagger so far
-      const hasCustom = cls === "hunter" && (wKey === "sword" || wKey === "dagger");
-      const suffix = hasCustom ? `_hunter` : ``;
+      const suffix = cls === "knight" ? "" : `_${cls}`;
       
       if (['sword', 'dagger', 'axe', 'scythe'].includes(wKey)) {
         rightArmSrc = `./assets/first_person/right_arm_${wKey}${suffix}.png?v=${v}`;
