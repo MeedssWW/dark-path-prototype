@@ -102,6 +102,13 @@ export function normalizeState(s) {
   }
   if (!Array.isArray(s.enemyGroup)) s.enemyGroup = [];
   if (!s.stats) s.stats = { heavenBosses: 0, hellBosses: 0, epicSlots: 0 };
+  
+  // Recover from broken intro state
+  if (s.heroClass && (!s.storyFlags || !s.storyFlags.intro_done)) {
+    s.heroClass = null;
+    s.awaitingEvent = false;
+  }
+  
   return s;
 }
 
