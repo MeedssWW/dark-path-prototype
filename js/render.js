@@ -284,7 +284,8 @@ function renderEnemyPack() {
 
 function renderEvent() {
   // Guard: if event state is inconsistent, auto-recover
-  if (state.awaitingEvent && !state.currentEvent) {
+  // Do not auto-recover if we are in the middle of the intro cinematic
+  if (state.awaitingEvent && !state.currentEvent && state.storyFlags?.intro_done) {
     state.awaitingEvent = false;
   }
   if (!state.awaitingEvent || !state.currentEvent) {
