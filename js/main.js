@@ -93,10 +93,114 @@ function startTickLoop() {
 function selectClass(classKey) {
   state.heroClass = classKey;
   const cls = heroClasses.find((c) => c.key === classKey);
-  addLog(state, `Путь выбран: ${cls?.name || classKey}.`);
+  addLog(state, `Выбран класс: ${cls?.name || classKey}.`);
+
+  startCinematic(classKey);
+}
+
+let cinematicSlides = [];
+let currentSlideIndex = 0;
+
+function startCinematic(classKey) {
+  // Define sequence
+  if (classKey === "knight") {
+    cinematicSlides = [
+      { type: "image", src: "assets/events/s2.png", text: "Засада на тракте... Я помню только крики, звон стали и сильный удар по шлему." },
+      { type: "image", src: "assets/events/s3.png", text: "Мародеры перебили всех, но моя броня спасла мне жизнь. Мои люди мертвы, но приказ остается приказом." },
+      { type: "video", src: "assets/events/s4.mp4", text: "В нагрудном кармане всё еще лежит Письмо с печатью Короля. Я должен дойти до столицы Морна, чего бы это ни стоило. Во имя Эренгарда." }
+    ];
+  } else if (classKey === "hunter") {
+    cinematicSlides = [
+      { type: "image", src: "assets/events/s5.png", text: "Дьявол... это была идеальная засада. Я пропустил удар в голову и отключился. Какая бездарная резня." },
+      { type: "image", src: "assets/events/s6.png", text: "И кто теперь заплатит мне за охрану этого сброда? Главное, что Письмо на месте. Эти идиоты забрали припасы, но оставили самое ценное." },
+      { type: "video", src: "assets/events/s7.mp4", text: "За доставку этого пергамента Корона пообещала столько золота, что хватит на собственный замок. Плевать на мертвецов, пора браться за дело." }
+    ];
+  } else if (classKey === "cultist") {
+    cinematicSlides = [
+      { type: "image", src: "assets/events/s8.png", text: "Засада была внезапной. Духи не предупредили меня... или просто хотели насладиться резней. Я очнулся среди крови моих мертвых спутников." },
+      { type: "image", src: "assets/events/s9.png", text: "У меня остался лишь ритуальный кинжал и этот кусок пергамента. Я чувствую, как от Письма исходит гнилостная аура." },
+      { type: "video", src: "assets/events/s10.mp4", text: "Короли думают, что управляют миром, но духи знают правду: это послание принесет жатву, которой лес еще не видел. И я стану ее вестником." }
+    ];
+  }
+
+  currentSlideIndex = 0;
+  state.awaitingEvent = true; // block game loop
+  renderCinematicSlide();
+}
+
+function renderCinematicSlide() {
+  const overlay = document.getElementById("cinematicOverlay");
+  const img = document.getElementById("cinematicImage");
+  const vid = document.getElementById("cinematicVideo");
+  const textEl = document.getElementById("cinematicText");
+
+  if (!overlay) return;
+
+  if (currentSlideIndex >= cinematicSlides.length) {
+    // Finish cinematic
+    overlay.classList.add("hidden");
+    vid.pause();
+    showActTitle();
+    return;
+  }
+
+  overlay.classList.remove("hidden");
+  const slide = cinematicSlides[currentSlideIndex];
+  textEl.textContent = slide.text;
+
+  if (slide.type === "image") {
+    vid.style.display = "none";
+    vid.pause();
+    img.src = slide.src;
+    img.style.display = "block";
+  } else {
+    img.style.display = "none";
+    vid.src = slide.src;
+    vid.style.display = "block";
+    vid.play();
+  }
+}
+
+function showActTitle() {
+  const actOverlay = document.getElementById("actTitleOverlay");
+  const actText = document.getElementById("actTitleText");
+  if (!actOverlay || !actText) return finishAwakening();
+
+  actOverlay.classList.remove("hidden");
+  actText.innerHTML = "Акт 1<br><span style='font-size:18px; color:#ccc; letter-spacing:8px;'>Кровавый Тракт</span>";
+  
+  // Fade in
+  setTimeout(() => {
+    actOverlay.style.opacity = "1";
+  }, 100);
+
+  // Fade out after 4 seconds
+  setTimeout(() => {
+    actOverlay.style.opacity = "0";
+    setTimeout(() => {
+      actOverlay.classList.add("hidden");
+      finishAwakening();
+    }, 2000);
+  }, 4000);
+}
+
+function finishAwakening() {
+  state.awaitingEvent = false;
+  state.storyFlags.intro_done = true;
   saveState();
   render();
 }
+
+// Hook up cinematic next button
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("cinematicNext");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      currentSlideIndex++;
+      renderCinematicSlide();
+    });
+  }
+});
 
 function setupClassOverlay() {
   const grid = document.getElementById("classChoices");
@@ -164,10 +268,7 @@ function summonBoss(side) {
   // Allow boss summoning anytime, require 5 souls
   if (state[`${side}Souls`] < 5) return;
   
-  // If already in combat, can't summon
-  if (state.currentEnemy && !state.currentEnemy.bossSide) return;
-  
-  // End current combat if any
+  // End current combat if any (to allow interrupting standard fights)
   if (state.currentEnemy) {
     state.enemyGroup = [];
     state.currentEnemy = null;
@@ -178,9 +279,9 @@ function summonBoss(side) {
   
   // Restore hero HP to max
   const hero = getHeroStats();
-  state.heroHp = hero.maxHp;
+  state.heroHp = hero.health; // Fix: use health instead of maxHp
   
-  addLog(state, side === "heaven" ? "Пять душ открыли врата Рая." : "Пять душ открыли врата Ада.");
+  addLog(state, side === "heaven" ? "Врата Рая открыты." : "Врата Ада открыты.");
   spawnEnemy(state, false, side);
   saveState();
   render();

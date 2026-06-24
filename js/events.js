@@ -1,11 +1,26 @@
-import { events } from "./data.js";
+import { events, storyEvents } from "./data.js";
 import { state, addLog, getHeroStats, saveState, updateStars } from "./state.js";
 import { generateLoot } from "./loot.js";
 import { spawnEnemy } from "./combat.js";
 import { audio } from "./audio.js";
 
 export function startEvent() {
-  const event = events[Math.floor(Math.random() * events.length)];
+  let event = null;
+
+  // Check if we need to show the intro knight
+  if (!state.storyFlags.intro_knight && state.sector >= 1 && state.encounter >= 1) {
+    event = storyEvents.find(e => e.key === "lore_intro_knight");
+  } else if (!state.storyFlags.met_deserter && state.sector >= 1 && state.encounter >= 3 && Math.random() < 0.5) {
+    event = storyEvents.find(e => e.key === "moral_deserter");
+  } else if (!state.storyFlags.met_patrol && state.sector >= 2 && Math.random() < 0.4) {
+    event = storyEvents.find(e => e.key === "moral_patrol");
+  }
+
+  // Fallback to random event
+  if (!event) {
+    event = events[Math.floor(Math.random() * events.length)];
+  }
+
   state.awaitingEvent = true;
   state.currentEvent = { ...event, choices: event.choices.map((c) => ({ ...c })) };
   addLog(state, `Событие: ${event.title}`);
@@ -199,6 +214,56 @@ const effectHandlers = {
     s.gold += gold;
     addLog(s, `Видение подсказало сокровище: +${gold} G.`);
   },
+  unlock_bosses: (s) => {
+    s.storyFlags.intro_knight = true;
+    s.bossUnlocked = true;
+    s.journalEntries.push({
+      title: "Откровение у костра",
+      text: "Я встретил безумца, который поведал мне о Душах Рая и Ада. Он утверждает, что собрав пять таких Душ, можно открыть Врата и бросить вызов их стражам. Кроме того, он упомянул, что предметы схожего происхождения резонируют друг с другом... Стоит быть внимательнее к экипировке."
+    });
+    addLog(s, "Вы открыли Дневник и получили знания о Вратах и Синергиях.");
+  },
+  deserter_help: (s) => {
+    s.storyFlags.met_deserter = true;
+    s.psyche.humanity += 10;
+    const stats = getHeroStats();
+    s.heroHp = Math.min(stats.health, s.heroHp + Math.round(stats.health * 0.15));
+    s.journalEntries.push({
+      title: "Раненый враг",
+      text: "Я перевязал раны дезертиру из армии противника. Война делает нас животными, но я решил остаться человеком. В благодарность он дал мне немного целебных трав."
+    });
+    addLog(s, "Человечность возросла. Здоровье восстановлено.");
+    audio.playHeal();
+  },
+  deserter_kill: (s) => {
+    s.storyFlags.met_deserter = true;
+    s.psyche.humanity -= 15;
+    s.gold += 35;
+    s.journalEntries.push({
+      title: "Слабость недопустима",
+      text: "Я добил дезертира. Война не прощает слабости, и у него было немного золота. Это просто необходимость."
+    });
+    addLog(s, "Жестокость возросла. Получено золото.");
+  },
+  patrol_lie: (s) => {
+    s.storyFlags.met_patrol = true;
+    s.psyche.doubt += 15;
+    s.journalEntries.push({
+      title: "Ложь во спасение",
+      text: "Я солгал патрулю Короны и пошел обходным путем. Почему я прячусь от своих же солдат? Письмо, которое я несу... возможно, в нем кроется что-то, что мне самому бы не понравилось."
+    });
+    addLog(s, "Сомнение растет. Вы избежали конфликта.");
+  },
+  patrol_truth: (s) => {
+    s.storyFlags.met_patrol = true;
+    s.psyche.loyalty += 15;
+    s.nextEliteChance = Math.max(s.nextEliteChance, 0.4);
+    s.journalEntries.push({
+      title: "Долг и честь",
+      text: "Я показал патрулю Приказ. Они козырнули и указали мне прямую, но опасную дорогу. Мой долг перед Короной священен."
+    });
+    addLog(s, "Лояльность растет. Следующий враг может быть элитным.");
+  }
 };
 
 export function runEventEffect(effectKey, s = state) {

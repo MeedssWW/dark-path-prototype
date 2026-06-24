@@ -180,10 +180,12 @@
           <div id="battleLog" class="battle-log"></div>
         </div>
 
-        <!-- Artifacts panel -->
-        <div class="tab-panel hidden" data-tab="artifacts">
-          <div id="artifactsList" class="artifacts-list"></div>
-          <small class="hint-text">Пассивные бонусы от побед над боссами.</small>
+        <!-- Journal panel -->
+        <div class="tab-panel hidden" data-tab="journal">
+          <div id="journalEntries" class="journal-entries">
+            <p class="muted-text">Дневник пуст. Ищи ответы в пути.</p>
+          </div>
+          <small class="hint-text">Здесь копятся знания о Синергиях и лоре мира.</small>
         </div>
       </section>
 
@@ -201,9 +203,9 @@
           <span class="tab-icon">📜</span>
           <span>Журнал</span>
         </button>
-        <button class="tab-btn" data-tab="artifacts" type="button">
-          <span class="tab-icon">🏆</span>
-          <span>Артефакты</span>
+        <button class="tab-btn" data-tab="journal" type="button">
+          <span class="tab-icon">📖</span>
+          <span>Дневник</span>
         </button>
         <button class="tab-btn" data-tab="reset" type="button">
           <span class="tab-icon">⚙️</span>
@@ -215,9 +217,13 @@
     <!-- Modals -->
     <div id="classOverlay" class="game-overlay">
       <div class="overlay-card wide">
-        <p class="label">Выбор пути</p>
-        <h2>Кто идёт по тёмной дороге?</h2>
-        <p class="overlay-desc">Класс влияет на стартовые статы и звёздную способность.</p>
+        <p class="label">Начало пути</p>
+        <h2>Письмо</h2>
+        <p class="overlay-desc" style="white-space: pre-wrap; font-size: 14px; text-align: left; line-height: 1.5;">Два королевства, Эренгард и Морн, застыли на пороге кровопролитной войны. Одно неверное слово — и начнется резня.
+
+Вы приходите в себя в приграничном грязном лесу. Ваш отряд перебит мародерами. У вас осталось лишь базовое оружие и запечатанное сургучом Письмо Короны, от которого зависят тысячи жизней. Вы должны доставить его любой ценой.
+
+Выберите свой класс:</p>
         <div id="classChoices" class="class-grid"></div>
       </div>
     </div>
@@ -234,6 +240,23 @@
       </div>
     </div>
 
+    <!-- Event/Dialogue Modal -->
+    <div id="eventOverlay" class="game-overlay hidden" style="z-index: 1000;">
+      <div class="overlay-card wide">
+        <div class="modal-header">
+          <p class="label" id="eventTag">Событие</p>
+        </div>
+        <div class="event-content">
+          <img id="eventImage" src="" style="width:100%; border-radius:4px; margin-bottom:12px; display:none;" />
+          <h2 id="eventTitle">Title</h2>
+          <p class="overlay-desc" id="eventText" style="white-space: pre-wrap; font-style: italic;">Text</p>
+        </div>
+        <div id="eventChoices" class="overlay-actions" style="flex-direction: column; gap: 8px; margin-top: 20px;">
+          <!-- Buttons injected here -->
+        </div>
+      </div>
+    </div>
+
     <div id="gearModal" class="game-overlay hidden">
       <div class="overlay-card wide">
         <div class="modal-header">
@@ -244,21 +267,42 @@
       </div>
     </div>
 
-    <div id="itemDetailsOverlay" class="game-overlay hidden">
-      <div class="overlay-card">
-        <div class="modal-header">
-          <p class="label" id="detailSlotName">Слот</p>
-          <button id="closeItemDetails" class="close-button" type="button">✕</button>
-        </div>
-        <div class="loot-top" style="margin-top: 12px; display: flex; gap: 12px; align-items: flex-start;">
-          <div id="detailIcon" class="item-icon-img large" style="width: 64px; height: 64px;"></div>
-          <div>
-            <h3 id="detailName" style="margin: 0 0 4px 0; font-size: 16px; color: var(--text);">Предмет</h3>
-            <p id="detailLevel" style="font-size: 12px; color: var(--dim); font-weight: 800; margin: 0 0 8px 0; text-transform: uppercase;">Ур. 1</p>
-            <div id="detailStats" style="display: flex; flex-direction: column; gap: 4px;"></div>
+      <div id="itemDetailsOverlay" class="game-overlay hidden">
+        <div class="overlay-card">
+          <div class="modal-header">
+            <p class="label" id="detailSlotName">Слот</p>
+            <button id="closeItemDetails" class="close-button" type="button">✖</button>
           </div>
+          <div class="loot-top" style="margin-top: 12px; display: flex; gap: 12px; align-items: flex-start;">
+            <div id="detailIcon" class="item-icon-img large"></div>
+            <div>
+              <span class="label">Выбрано:</span>
+              <h3 id="detailName">Название</h3>
+              <p id="detailDesc" class="item-desc"></p>
+            </div>
+          </div>
+          <div id="detailStats" class="item-stats" style="margin-top: 16px;"></div>
         </div>
       </div>
+
+    </div>
+
+    <!-- Cinematic Overlay -->
+    <div id="cinematicOverlay" class="game-overlay hidden" style="z-index: 2000; background: #000; flex-direction: column; justify-content: flex-end;">
+      <div id="cinematicMediaContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+        <img id="cinematicImage" src="" style="width: 100%; height: 100%; object-fit: cover; display: none; opacity: 0.8;" />
+        <video id="cinematicVideo" src="" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: none; opacity: 0.8;"></video>
+        <div style="position:absolute; bottom:0; left:0; width:100%; height:60%; background: linear-gradient(to top, #000 0%, transparent 100%); pointer-events:none;"></div>
+      </div>
+      <div style="position: relative; z-index: 2001; padding: 32px 24px; text-align: center; width: 100%; box-sizing: border-box;">
+        <p id="cinematicText" style="font-size: 16px; font-style: italic; text-shadow: 0 2px 4px #000, 0 0 10px #000; white-space: pre-wrap; margin-bottom: 32px; line-height: 1.6;"></p>
+        <button id="cinematicNext" class="primary-button" style="margin: 0 auto; width: 200px;">Далее</button>
+      </div>
+    </div>
+
+    <!-- Act Title Overlay -->
+    <div id="actTitleOverlay" class="game-overlay hidden" style="z-index: 2100; background: #000; display: flex; align-items: center; justify-content: center; transition: opacity 2s ease-in-out;">
+      <h1 id="actTitleText" style="font-size: 32px; letter-spacing: 4px; text-align: center; text-transform: uppercase; text-shadow: 0 0 20px rgba(255,50,50,0.8);"></h1>
     </div>
 
     <div id="milestoneToast" class="milestone-toast" aria-live="polite">

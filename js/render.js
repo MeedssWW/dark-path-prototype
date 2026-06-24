@@ -53,11 +53,12 @@ export function bindElements() {
     "realRightArm",
     "combatStatus",
     "starCharge",
-    "eventPanel",
-    "eventKind",
+    "eventOverlay",
+    "eventTag",
     "eventTitle",
     "eventText",
-    "eventActions",
+    "eventChoices",
+    "eventImage",
     "battleLog",
     "pauseToggle",
     "goldValue",
@@ -259,7 +260,11 @@ function renderSynergyBar(heroStats) {
     ...active.map((s) => `<span class="synergy-chip active">${s.name}</span>`),
     ...sets.map((s) => `<span class="synergy-chip set">${s.label}</span>`),
   ];
-  els.synergyBar.innerHTML = parts.join("") || '<span class="synergy-chip muted">Собери синергии из лута</span>';
+  if (!state.bossUnlocked) {
+    els.synergyBar.innerHTML = '<span class="synergy-chip muted">Неизвестно</span>';
+  } else {
+    els.synergyBar.innerHTML = parts.join("") || '<span class="synergy-chip muted">Нет синергий</span>';
+  }
 }
 
 function renderEnemyPack() {
@@ -283,16 +288,26 @@ function renderEvent() {
     state.awaitingEvent = false;
   }
   if (!state.awaitingEvent || !state.currentEvent) {
-    els.eventPanel?.classList.add("hidden");
+    els.eventOverlay?.classList.add("hidden");
     return;
   }
   const event = state.currentEvent;
-  els.eventPanel?.classList.remove("hidden");
-  if (els.eventKind) els.eventKind.textContent = event.kind;
+  els.eventOverlay?.classList.remove("hidden");
+  if (els.eventTag) els.eventTag.textContent = event.kind || "Событие";
   if (els.eventTitle) els.eventTitle.textContent = event.title;
   if (els.eventText) els.eventText.textContent = event.text;
-  if (!els.eventActions) return;
-  els.eventActions.innerHTML = "";
+  
+  if (els.eventImage) {
+    if (event.image) {
+      els.eventImage.src = event.image;
+      els.eventImage.style.display = "block";
+    } else {
+      els.eventImage.style.display = "none";
+    }
+  }
+
+  if (!els.eventChoices) return;
+  els.eventChoices.innerHTML = "";
   event.choices.forEach((choice) => {
     const button = document.createElement("button");
     button.type = "button";
@@ -302,7 +317,7 @@ function renderEvent() {
       finishEvent(state);
       render();
     });
-    els.eventActions.appendChild(button);
+      els.eventChoices.appendChild(button);
   });
   
   els.speedToggle?.addEventListener("click", () => {
@@ -414,21 +429,20 @@ function renderGear() {
     .join("");
 }
 
-function renderArtifacts() {
-  if (!els.artifactsList) return;
-  if (!state.artifacts || state.artifacts.length === 0) {
-    els.artifactsList.innerHTML = '<p class="muted-text">нет артефактов</p>';
+function renderJournal() {
+  const container = document.getElementById("journalEntries");
+  if (!container) return;
+  if (!state.journalEntries || state.journalEntries.length === 0) {
+    container.innerHTML = '<p class="muted-text">Дневник пуст. Ищи ответы в пути.</p>';
     return;
   }
-  els.artifactsList.innerHTML = state.artifacts
-    .map((artifactId) => {
-      const artifact = artifacts.find((a) => a.id === artifactId);
-      if (!artifact) return "";
-      return `<div class="artifact-badge" title="${artifact.description}" style="border-color: ${artifact.rarity === "legendary" ? "#ffb84d" : "#62a8ff"}">
-        <strong style="color: ${artifact.rarity === "legendary" ? "#ffb84d" : "#62a8ff"}">${artifact.name}</strong>
-        <small>${artifact.description}</small>
-      </div>`;
-    })
+  container.innerHTML = state.journalEntries
+    .map((entry) => `
+      <div class="journal-entry">
+        <strong>${entry.title}</strong>
+        <p>${entry.text}</p>
+      </div>
+    `)
     .join("");
 }
 
@@ -541,7 +555,7 @@ export function render() {
   renderHands();
   renderLoot();
   renderGear();
-  renderArtifacts();
+  renderJournal();
   renderDrops();
   renderLog();
   renderBuffBar();
@@ -557,9 +571,18 @@ export function render() {
   if (els.heavenSouls) els.heavenSouls.textContent = `${state.heavenSouls} / 5`;
   if (els.hellSouls) els.hellSouls.textContent = `${state.hellSouls} / 5`;
 
-  // Allow boss summoning anytime (except during events/choices)
-  if (els.summonHeaven) els.summonHeaven.disabled = state.heavenSouls < 5 || state.awaitingEvent;
-  if (els.summonHell) els.summonHell.disabled = state.hellSouls < 5 || state.awaitingEvent;
+  // Hide or disable boss actions based on unlocks
+  const bossActions = document.querySelector('.boss-actions');
+  if (bossActions) {
+    if (state.bossUnlocked) {
+      bossActions.style.display = 'flex';
+      if (els.summonHeaven) els.summonHeaven.disabled = state.heavenSouls < 5 || state.awaitingEvent;
+      if (els.summonHell) els.summonHell.disabled = state.hellSouls < 5 || state.awaitingEvent;
+    } else {
+      bossActions.style.display = 'none';
+    }
+  }
+
   if (els.upgradeCost) els.upgradeCost.textContent = `Стоимость: ${upgradeCost()} G`;
   if (els.upgradeHero) els.upgradeHero.disabled = state.gold < upgradeCost();
   if (els.rerollLoot) els.rerollLoot.disabled = !state.pendingLoot || state.gold < rerollCost();
