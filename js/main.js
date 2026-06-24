@@ -20,7 +20,7 @@ import {
 } from "./combat.js";
 import { equipPendingLoot, sellPendingLoot, rerollPendingLoot } from "./loot.js";
 import { audio } from "./audio.js";
-import { bindElements, render, els, setCombatStatus, setSpeedMultiplier } from "./render.js?v=19";
+import { bindElements, render, els, setCombatStatus, setSpeedMultiplier } from "./render.js?v=20";
 import { getSpeedMultiplier } from "./fx.js";
 import { getAliveEnemies } from "./state.js";
 import { checkMilestones } from "./milestones.js";

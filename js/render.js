@@ -353,19 +353,26 @@ function renderHands() {
   if (els.realLeftArm) {
     els.realLeftArm.style.display = 'block';
   }
+  // Weapon and Offhand
+  const v = 20;
+  
   if (els.realRightArm) {
     els.realRightArm.style.display = 'block';
+    let rightArmSrc = `./assets/first_person/right_arm.png?v=${v}`;
+    if (weapon) {
+      const wKey = weapon.type.key;
+      if (['sword', 'dagger', 'axe', 'scythe'].includes(wKey)) {
+        rightArmSrc = `./assets/first_person/right_arm_${wKey}.png?v=${v}`;
+      } else {
+        rightArmSrc = `./assets/first_person/right_arm_sword.png?v=${v}`; // Fallback generic weapon grip
+      }
+    }
+    processChromaKey(rightArmSrc).then(url => els.realRightArm.src = url);
   }
 
-  // Weapon and Offhand
-  const v = 19;
+  // Hide the old playerWeaponImg since the weapon is now baked into the hand
   if (els.playerWeaponImg) {
-    if (weapon) {
-      els.playerWeaponImg.style.display = 'block';
-      els.playerWeaponImg.src = `./assets/first_person/${weapon.type.key}.png?v=${v}`;
-    } else {
-      els.playerWeaponImg.style.display = 'none';
-    }
+    els.playerWeaponImg.style.display = 'none';
   }
   if (els.playerOffhandImg) {
     if (offhand) {
