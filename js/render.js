@@ -106,6 +106,7 @@ export function bindElements() {
   ].forEach((id) => {
     els[id] = document.getElementById(id);
   });
+  loadFpAssets();
 }
 
 export function setSpeedMultiplier(v) {
@@ -331,8 +332,6 @@ function renderEvent() {
     if (state.speed > 1) els.speedToggle.classList.add("active");
     else els.speedToggle.classList.remove("active");
   });
-  
-  loadFpAssets();
 }
 
 function renderStats(heroStats) {
