@@ -3192,3 +3192,8 @@ body[data-location="abyss"] .ruin-right {
   50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 30px rgba(255,50,50,1); } 
   100% { opacity: 0.5; transform: scale(1); } 
 }
+
+@keyframes fadeLore {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

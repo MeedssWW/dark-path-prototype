@@ -475,6 +475,15 @@ export function updateOverlays() {
   const needTutorial = state.heroClass && !state.tutorialDone;
   els.classOverlay?.classList.toggle("hidden", !needClass);
   els.tutorialOverlay?.classList.toggle("hidden", !needTutorial);
+
+  const appContainer = document.getElementById("app");
+  if (appContainer) {
+    if (!state.storyFlags?.intro_done) {
+      appContainer.style.display = "none";
+    } else {
+      appContainer.style.display = ""; // revert to normal layout
+    }
+  }
 }
 
 export function render() {
