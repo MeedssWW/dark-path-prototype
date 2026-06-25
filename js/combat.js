@@ -401,7 +401,10 @@ export function defeatEnemy() {
     audio.playLoot();
     checkMilestones(state);
   } else {
-    if (!state.pendingLoot && Math.random() < 0.58) {
+    // No loot from the very first monster
+    if (state.sector === 1 && state.encounter === 1) {
+      state.pendingLoot = null;
+    } else if (!state.pendingLoot && Math.random() < 0.58) {
       state.pendingLoot = generateLoot(false);
       audio.playLoot();
     }

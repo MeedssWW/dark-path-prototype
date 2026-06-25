@@ -768,12 +768,13 @@ export function showItemDetails(slotKey) {
 }
 
 export function triggerHeroAttackAnim() {
-  if (els.realRightArm) {
-    els.realRightArm.classList.remove('attacking-right-arm');
-    void els.realRightArm.offsetWidth; // trigger reflow
-    els.realRightArm.classList.add('attacking-right-arm');
+  const container = els.realRightArm?.parentElement;
+  if (container) {
+    container.classList.remove('attacking-right-arm');
+    void container.offsetWidth; // trigger reflow
+    container.classList.add('attacking-right-arm');
     setTimeout(() => {
-      if (els.realRightArm) els.realRightArm.classList.remove('attacking-right-arm');
+      if (container) container.classList.remove('attacking-right-arm');
     }, 450);
   }
 }
