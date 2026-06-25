@@ -250,6 +250,7 @@ function finishAwakening() {
   state.awaitingEvent = false;
   if (!state.storyFlags) state.storyFlags = {};
   state.storyFlags.intro_done = true;
+  state.walkDelay = Date.now() + 5000;
   saveState();
   render();
 }
