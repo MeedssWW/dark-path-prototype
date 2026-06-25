@@ -202,17 +202,11 @@ export function maybeNextEncounter() {
     }
   }
 
-  const eventChanceBase = state.encounter === 4 ? BALANCE.eventChanceLast : BALANCE.eventChance;
-  const eventChance = Math.min(BALANCE.eventChanceMax, eventChanceBase + state.sector * BALANCE.eventChanceGrowth);
-  if (Math.random() < eventChance) {
-    startEvent();
-  } else {
-    const eliteRollBase = state.nextEliteChance > 0 ? state.nextEliteChance : BALANCE.eliteChance + state.sector * BALANCE.eliteChanceGrowth;
-    const eliteRoll = Math.min(BALANCE.eliteChanceMax, eliteRollBase);
-    const isElite = Math.random() < eliteRoll;
-    if (state.nextEliteChance > 0) state.nextEliteChance = 0;
-    spawnEnemy(state, isElite);
-  }
+  const eliteRollBase = state.nextEliteChance > 0 ? state.nextEliteChance : BALANCE.eliteChance + state.sector * BALANCE.eliteChanceGrowth;
+  const eliteRoll = Math.min(BALANCE.eliteChanceMax, eliteRollBase);
+  const isElite = Math.random() < eliteRoll;
+  if (state.nextEliteChance > 0) state.nextEliteChance = 0;
+  spawnEnemy(state, isElite);
 }
 
 function getHitChance(accuracy, evasion) {
