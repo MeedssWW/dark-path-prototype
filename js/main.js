@@ -162,7 +162,9 @@ function renderCinematicSlide() {
   if (currentSlideIndex >= cinematicSlides.length) {
     // Finish cinematic
     overlay.classList.add("hidden");
-    vid.pause();
+    if (vid) vid.pause();
+    if (eyelidTop) eyelidTop.style.height = "0%";
+    if (eyelidBottom) eyelidBottom.style.height = "0%";
     showActTitle();
     return;
   }
@@ -214,7 +216,10 @@ function renderCinematicSlide() {
     img.style.display = "none";
     vid.src = slide.src;
     vid.style.display = "block";
-    vid.play().catch(console.error);
+    const playPromise = vid.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(console.error);
+    }
     finishSlideRender();
   }
 }
