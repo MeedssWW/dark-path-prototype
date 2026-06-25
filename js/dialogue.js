@@ -49,6 +49,13 @@ function renderDialogueNode() {
 
   const textEl = document.getElementById("dialogueText");
   const choicesEl = document.getElementById("dialogueChoices");
+  const portraitEl = document.getElementById("dialoguePortrait");
+  
+  if (portraitEl) {
+    portraitEl.src = `./assets/npc/${dlg.npc}.png`;
+    portraitEl.style.display = "block";
+    portraitEl.onerror = () => { portraitEl.style.display = "none"; };
+  }
   
   if (textEl) {
     textEl.innerHTML = "";
@@ -89,9 +96,10 @@ function renderChoices(options) {
 function selectChoice(opt) {
   // Apply stats
   if (opt.stats) {
-    if (opt.stats.loyalty) updateEpicStat("loyalty", opt.stats.loyalty);
-    if (opt.stats.doubt) updateEpicStat("doubt", opt.stats.doubt);
-    if (opt.stats.humanity) updateEpicStat("humanity", opt.stats.humanity);
+    if (!state.psyche) state.psyche = { loyalty: 0, doubt: 0, humanity: 0 };
+    if (opt.stats.loyalty) state.psyche.loyalty += opt.stats.loyalty;
+    if (opt.stats.doubt) state.psyche.doubt += opt.stats.doubt;
+    if (opt.stats.humanity) state.psyche.humanity += opt.stats.humanity;
   }
   
   // Apply affinity

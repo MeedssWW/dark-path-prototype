@@ -43,6 +43,19 @@ async function playCombatPhase(className, label, duration) {
 async function combatTick() {
   if (combatAnimating) return;
   if (!state.heroClass) return render();
+  
+  if (state.walkDelay) {
+    if (Date.now() < state.walkDelay) {
+      return render();
+    } else {
+      state.walkDelay = 0;
+      if (state.pendingDialogue) {
+        import("./dialogue.js").then(({ startDialogue }) => startDialogue(state.pendingDialogue));
+        state.pendingDialogue = null;
+      }
+    }
+  }
+
   if (state.paused || state.awaitingEvent || state.pendingLoot || state.currentDialogue) return render();
 
   maybeNextEncounter();
