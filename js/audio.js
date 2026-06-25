@@ -70,6 +70,22 @@ export const audio = {
     tone(350, 0.14, "sine", 0.03);
   },
 
+  async forcePlay(htmlAudio, button) {
+    ensureCtx();
+    if (htmlAudio && htmlAudio.paused) {
+      try {
+        await htmlAudio.play();
+        button?.classList.add("active");
+        this.stopAmbient();
+        musicOn = true;
+      } catch (e) {}
+    } else if (!htmlAudio && !musicOn) {
+      this.startAmbient();
+      button?.classList.add("active");
+      musicOn = true;
+    }
+  },
+
   async toggleMusic(htmlAudio, button) {
     ensureCtx();
     if (htmlAudio) {

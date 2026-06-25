@@ -109,6 +109,7 @@ function selectClass(classKey) {
   const cls = heroClasses.find((c) => c.key === classKey);
   addLog(state, `Выбран класс: ${cls?.name || classKey}.`);
 
+  audio.forcePlay(els.musicPlayer, els.audioToggle);
   startCinematic(classKey);
 }
 
@@ -545,6 +546,7 @@ function init() {
         combatAnimating = false;
         setState(structuredClone(defaultState));
         tutorialIndex = 0;
+        audio.forcePlay(els.musicPlayer, els.audioToggle);
         startTickLoop();
         render();
         return;
