@@ -60,6 +60,9 @@ export function loadState() {
       merged.enemyGroup = [];
       merged.pendingLoot = null;
       merged.starHits = 0;
+      merged.currentDialogue = null;
+      merged.pendingDialogue = null;
+      merged.walkDelay = 0;
       if (!merged.stats) merged.stats = { heavenBosses: 0, hellBosses: 0, epicSlots: 0 };
       if (!merged.milestonesSeen) merged.milestonesSeen = {};
       // Validate heroClass still exists in current data

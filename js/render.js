@@ -206,9 +206,9 @@ function formatItemStats(item) {
 }
 
 const locationVideoMap = {
-  "Черный Лес": "Черный_Лес.mp4",
-  "Разбитая Цитадель": "Разбитая_Цитадель.mp4",
-  "Пылающее Подземелье": "Пылающее_Подземелье.mp4",
+  "Черный Лес": "dark_forest.mp4",
+  "Разбитая Цитадель": "castle.mp4",
+  "Пылающее Подземелье": "dungeon.mp4",
 };
 
 function enemySpritePath(name) {
@@ -388,19 +388,21 @@ function renderHands() {
   
   if (els.realLeftArm) {
     els.realLeftArm.style.display = 'block';
-    const leftArmSrc = cls === "knight" ? `./assets/first_person/left_arm.png?v=${v}` : `./assets/first_person/left_arm_${cls}.png?v=${v}`;
+    const isKnight = cls === "knight" || cls === "dark_knight";
+    const leftArmSrc = isKnight ? `./assets/first_person/left_arm.png?v=${v}` : `./assets/first_person/left_arm_${cls}.png?v=${v}`;
     processChromaKey(leftArmSrc).then(url => els.realLeftArm.src = url);
   }
 
   if (els.realRightArm) {
     els.realRightArm.style.display = 'block';
+    const isKnight = cls === "knight" || cls === "dark_knight";
     
     // Default fallback is the base arm
-    let rightArmSrc = cls === "knight" ? `./assets/first_person/right_arm.png?v=${v}` : `./assets/first_person/right_arm_${cls}.png?v=${v}`;
+    let rightArmSrc = isKnight ? `./assets/first_person/right_arm.png?v=${v}` : `./assets/first_person/right_arm_${cls}.png?v=${v}`;
 
     if (weapon) {
       const wKey = weapon.type.key;
-      const suffix = cls === "knight" ? "" : `_${cls}`;
+      const suffix = isKnight ? "" : `_${cls}`;
       
       if (['sword', 'dagger', 'axe', 'scythe'].includes(wKey)) {
         rightArmSrc = `./assets/first_person/right_arm_${wKey}${suffix}.png?v=${v}`;
