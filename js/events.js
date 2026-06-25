@@ -7,15 +7,6 @@ import { audio } from "./audio.js";
 export function startEvent() {
   let event = null;
 
-  // Check if we need to show the intro knight
-  if (!state.storyFlags.intro_knight && state.sector >= 1 && state.encounter >= 1) {
-    event = storyEvents.find(e => e.key === "lore_intro_knight");
-  } else if (!state.storyFlags.met_deserter && state.sector >= 1 && state.encounter >= 3 && Math.random() < 0.5) {
-    event = storyEvents.find(e => e.key === "moral_deserter");
-  } else if (!state.storyFlags.met_patrol && state.sector >= 2 && Math.random() < 0.4) {
-    event = storyEvents.find(e => e.key === "moral_patrol");
-  }
-
   // Fallback to random event
   if (!event) {
     event = events[Math.floor(Math.random() * events.length)];
