@@ -18,7 +18,7 @@ import {
   reviveAtSectorStart,
   spawnEnemy,
 } from "./combat.js";
-import { equipPendingLoot, sellPendingLoot, rerollPendingLoot } from "./loot.js";
+import { equipPendingLoot, sellPendingLoot, rerollPendingLoot, generateItem } from "./loot.js";
 import { audio } from "./audio.js";
 import { bindElements, render, els, setCombatStatus, setSpeedMultiplier, triggerHeroAttackAnim } from "./render.js?v=28";
 import { getSpeedMultiplier } from "./fx.js";
@@ -43,7 +43,7 @@ async function playCombatPhase(className, label, duration) {
 async function combatTick() {
   if (combatAnimating) return;
   if (!state.heroClass) return render();
-  if (state.paused || state.awaitingEvent || state.pendingLoot) return render();
+  if (state.paused || state.awaitingEvent || state.pendingLoot || state.currentDialogue) return render();
 
   maybeNextEncounter();
   if (!state.currentEnemy) return render();
@@ -397,6 +397,50 @@ function setupLootSwipes() {
   }
 }
 
+window.craftEquipment = function(type) {
+  if (!state.resources) state.resources = { iron: 0, soulDust: 0 };
+  let costIron = 0;
+  let costDust = 0;
+  
+  if (type === "weapon") { costIron = 10; costDust = 2; }
+  else if (type === "armor") { costIron = 12; costDust = 1; }
+  else if (type === "accessory") { costIron = 5; costDust = 5; }
+  
+  const resultEl = document.getElementById("craftingResult");
+  
+  if (state.resources.iron >= costIron && state.resources.soulDust >= costDust) {
+    state.resources.iron -= costIron;
+    state.resources.soulDust -= costDust;
+    
+    // Determine rarity based on sector and random chance
+    const roll = Math.random();
+    let rarityKey = "common";
+    if (roll > 0.9) rarityKey = "epic";
+    else if (roll > 0.6) rarityKey = "rare";
+    
+    const itemLevel = state.sector * 10;
+    const item = generateItem(type, itemLevel, rarityKey);
+    
+    // Add directly to inventory
+    const old = state.inventory[item.slot];
+    if (old) state.gold += Math.floor(old.value * 0.45);
+    state.inventory[item.slot] = item;
+    
+    addLog(state, `Скрафчен предмет: ${item.name}`);
+    if (resultEl) resultEl.textContent = `Успех! Скрафчен: ${item.name}`;
+    
+    saveState();
+    checkMilestones(state);
+    import("./render.js").then(({ render }) => render());
+  } else {
+    if (resultEl) {
+      resultEl.textContent = "Не хватает ресурсов!";
+      resultEl.style.color = "#e55";
+      setTimeout(() => { resultEl.style.color = "#6c4"; resultEl.textContent = ""; }, 2000);
+    }
+  }
+};
+
 function init() {
   bindElements();
   setupClassOverlay();
@@ -543,10 +587,29 @@ function init() {
     await audio.toggleMusic(els.musicPlayer, els.audioToggle);
     if (!els.musicPlayer?.paused) return;
     if (!document.querySelector(".audio-hint")) {
-      addLog(state, "Музыка: ♪ (MP3 или синтез). Положи hide-cs01-slowed.mp3 в assets/.");
+      addLog(state, "Совет: Скопируй (MP3) музыку в assets/.");
       render();
     }
   });
+
+  const synergyBar = document.getElementById("synergyBar");
+  if (synergyBar) {
+    synergyBar.addEventListener("mousemove", (e) => {
+      const item = e.target.closest(".synergy-item");
+      if (item) {
+        els.synergyTooltip.classList.remove("hidden");
+        els.synergyTooltipTitle.textContent = item.dataset.title;
+        els.synergyTooltipDesc.textContent = item.dataset.desc;
+        els.synergyTooltip.style.left = e.pageX + 10 + "px";
+        els.synergyTooltip.style.top = e.pageY + 10 + "px";
+      }
+    });
+    synergyBar.addEventListener("mouseout", (e) => {
+      if (e.target.closest(".synergy-item")) {
+        els.synergyTooltip.classList.add("hidden");
+      }
+    });
+  }
 
   startTickLoop();
 }

@@ -10,7 +10,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Dark Path Prototype</title>
-    <link rel="stylesheet" href="./styles.css?v=15" />
+    <link rel="stylesheet" href="./styles.css?v=29" />
   <script>
     window.addEventListener('error', function(e) {
       document.body.innerHTML += "<div style='color:red;font-size:16px;position:absolute;top:0;left:0;z-index:9999;background:black;padding:10px;'>" + 
@@ -48,7 +48,10 @@
       <!-- ═══ BATTLE SCENE ═══ -->
       <section class="battle-section">
         <div class="road-scene" id="roadScene">
-          <video id="locationVideo" class="location-video" autoplay muted loop playsinline></video>
+          <!-- Double video players for seamless crossfade loop -->
+          <video id="locationVideo" class="location-video" autoplay muted playsinline style="position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 1; transition: opacity 1s ease-in-out;"></video>
+          <video id="locationVideo2" class="location-video" autoplay muted playsinline style="position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s ease-in-out;"></video>
+          
           <div class="road-scene-bg" id="roadSceneBg"></div>
           <div class="road-lines"></div>
           <div class="enemy-pack" id="enemyPack"></div>
@@ -137,9 +140,16 @@
         <div class="tab-panel hidden" data-tab="stats">
           <div class="stats-compact">
             <div class="level-row">
-              <div><span class="label">Улучшений</span><strong id="upgradeCount">0</strong></div>
-              <div><span class="label">Звезды</span><strong id="starCount">0</strong></div>
+              <div><span class="label">ОБНОВЛЕНИЯ</span><strong id="upgradeCount">0</strong></div>
+              <div><span class="label">ЗВЕЗДЫ</span><strong id="starCount">0</strong></div>
             </div>
+            
+            <div class="psyche-stats">
+              <div class="psyche-item"><span class="label">Человечность</span><strong id="psycheHumanity">0</strong></div>
+              <div class="psyche-item"><span class="label">Верность</span><strong id="psycheLoyalty">0</strong></div>
+              <div class="psyche-item"><span class="label">Сомнение</span><strong id="psycheDoubt">0</strong></div>
+            </div>
+
             <div id="statsGrid" class="stats-grid"></div>
             <div class="upgrade-box">
               <button id="upgradeHero" class="primary-button" type="button">Улучшить героя</button>
@@ -178,29 +188,50 @@
         <!-- Journal panel -->
         <div class="tab-panel hidden" data-tab="journal">
           <div id="journalEntries" class="journal-entries">
-            <p class="muted-text">Дневник пуст. Ищи ответы в пути.</p>
+            <p class="muted-text">Журнал пуст. Ищи сюжетные события.</p>
           </div>
-          <small class="hint-text">Здесь копятся знания о Синергиях и лоре мира.</small>
+          <small class="hint-text">События обновляют лор и прогресс к концовкам.</small>
+        </div>
+
+        <!-- Craft panel -->
+        <div class="tab-panel hidden" data-tab="craft">
+          <div style="padding: 10px; color: #ddd;">
+            <h3 style="margin-top: 0;">Кузница</h3>
+            <p style="font-size: 14px; margin-bottom: 10px; display:flex; align-items:center; gap:8px;">
+              <img src="./assets/items/iron.png" style="width:20px; height:20px;"> <span id="craftIronCount" style="color:#aaa;">0</span>
+              <img src="./assets/items/soul_dust.png" style="width:20px; height:20px; margin-left:10px;"> <span id="craftDustCount" style="color:#aaa;">0</span>
+            </p>
+            <div id="craftingOptions" style="display:flex; flex-direction:column; gap:8px;">
+              <button class="menu-btn" onclick="window.craftEquipment('weapon')">Оружие (10 <img src="./assets/items/iron.png" style="width:16px; vertical-align:middle;">, 2 <img src="./assets/items/soul_dust.png" style="width:16px; vertical-align:middle;">)</button>
+              <button class="menu-btn" onclick="window.craftEquipment('armor')">Броня (12 <img src="./assets/items/iron.png" style="width:16px; vertical-align:middle;">, 1 <img src="./assets/items/soul_dust.png" style="width:16px; vertical-align:middle;">)</button>
+              <button class="menu-btn" onclick="window.craftEquipment('accessory')">Аксессуар (5 <img src="./assets/items/iron.png" style="width:16px; vertical-align:middle;">, 5 <img src="./assets/items/soul_dust.png" style="width:16px; vertical-align:middle;">)</button>
+            </div>
+            <p id="craftingResult" style="color: #6c4; margin-top: 10px; font-weight: bold;"></p>
+          </div>
         </div>
       </section>
 
       <!-- ═══ BOTTOM TAB BAR ═══ -->
       <nav class="bottom-tabs" id="tabsBar">
         <button class="tab-btn" data-tab="stats" type="button">
-          <span class="tab-icon">📊</span>
+          <span class="tab-icon">📈</span>
           <span>Статы</span>
         </button>
-        <button class="tab-btn" data-tab="souls" type="button">
-          <span class="tab-icon">👻</span>
+        <button class="tab-btn" data-tab="craft" type="button">
+          <span class="tab-icon">⚒️</span>
+          <span>Крафт</span>
+        </button>
+        <button class="tab-btn hidden" data-tab="souls" type="button" style="display:none;">
+          <span class="tab-icon">🔥</span>
           <span>Души</span>
         </button>
         <button class="tab-btn" data-tab="log" type="button">
           <span class="tab-icon">📜</span>
-          <span>Журнал</span>
+          <span>Битвы</span>
         </button>
         <button class="tab-btn" data-tab="journal" type="button">
           <span class="tab-icon">📖</span>
-          <span>Дневник</span>
+          <span>Журнал</span>
         </button>
         <button class="tab-btn" data-tab="reset" type="button">
           <span class="tab-icon">⚙️</span>
@@ -276,20 +307,38 @@
       </div>
 
     </div>
+      
+    <!-- Synergy Tooltip -->
+    <div id="synergyTooltip" class="synergy-tooltip hidden">
+      <h4 id="synergyTooltipTitle">Synergy Name</h4>
+      <p id="synergyTooltipDesc">Buffs here</p>
+    </div>
+
+    <!-- Global Eyelids for Transitions -->
+    <div id="eyelidTop" style="position:fixed; top:0; left:0; width:100vw; height:0%; background:#000; z-index:9999; transition: height 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); pointer-events:none; border-bottom: 2px solid rgba(0,0,0,0.8); box-shadow: 0 10px 20px rgba(0,0,0,0.9);"></div>
+    <div id="eyelidBottom" style="position:fixed; bottom:0; left:0; width:100vw; height:0%; background:#000; z-index:9999; transition: height 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); pointer-events:none; border-top: 2px solid rgba(0,0,0,0.8); box-shadow: 0 -10px 20px rgba(0,0,0,0.9);"></div>
 
     <!-- Cinematic Overlay -->
     <div id="cinematicOverlay" class="game-overlay hidden" style="background: #000; padding: 20px; cursor: pointer;">
       <div class="overlay-card wide" style="position: relative; overflow: hidden; padding: 0; background: transparent; border: none; max-width: 900px; width: 100%;">
-        <!-- Realistic Eyelids -->
-        <div id="eyelidTop" style="position:absolute; top:0; left:0; width:100%; height:50%; background:#000; z-index:10; transition: height 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); pointer-events:none; border-bottom: 2px solid rgba(0,0,0,0.8); box-shadow: 0 10px 20px rgba(0,0,0,0.9);"></div>
-        <div id="eyelidBottom" style="position:absolute; bottom:0; left:0; width:100%; height:50%; background:#000; z-index:10; transition: height 0.6s cubic-bezier(0.4, 0.0, 0.2, 1); pointer-events:none; border-top: 2px solid rgba(0,0,0,0.8); box-shadow: 0 -10px 20px rgba(0,0,0,0.9);"></div>
-        
         <img id="cinematicImage" src="" style="width: 100%; height: auto; max-height: 70vh; object-fit: contain; display: none;" />
         <video id="cinematicVideo" src="" autoplay muted playsinline style="width: 100%; height: auto; max-height: 70vh; object-fit: contain; display: none;"></video>
         
         <div style="padding: 24px; text-align: center;">
           <p id="cinematicText" style="font-size: 16px; font-style: italic; white-space: pre-wrap; margin-bottom: 24px; min-height: 80px; opacity: 0; transition: opacity 1s ease-in-out;"></p>
           <p id="cinematicNextHint" style="opacity: 0; font-size: 12px; color: #666; transition: opacity 1s ease-in-out;">Нажмите в любом месте, чтобы продолжить...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialogue Overlay -->
+    <div id="dialogueOverlay" class="game-overlay hidden" style="z-index: 2000; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: flex-end; padding-bottom: 50px;">
+      <div style="display: flex; flex-direction: column; width: 100%; max-width: 800px; padding: 20px; gap: 20px;">
+        <div style="background: rgba(20,20,20,0.9); border: 1px solid #444; border-radius: 8px; padding: 20px; min-height: 120px; box-shadow: 0 5px 20px rgba(0,0,0,0.5);">
+          <p id="dialogueText" style="font-size: 18px; line-height: 1.5; color: #ddd; margin: 0;"></p>
+        </div>
+        <div id="dialogueChoices" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Buttons generated by JS -->
         </div>
       </div>
     </div>

@@ -64,6 +64,12 @@ export function bindElements() {
     "goldValue",
     "upgradeCount",
     "starCount",
+    "psycheHumanity",
+    "psycheLoyalty",
+    "psycheDoubt",
+    "synergyTooltip",
+    "synergyTooltipTitle",
+    "synergyTooltipDesc",
     "statsGrid",
     "upgradeHero",
     "upgradeCost",
@@ -255,17 +261,39 @@ function renderBuffBar() {
 
 function renderSynergyBar(heroStats) {
   if (!els.synergyBar) return;
-  const active = getActiveSynergies(heroStats);
+  const active = getActiveSynergies(heroStats, state.heroClass);
   const sets = getSetBonuses(state.inventory);
-  const parts = [
-    ...active.map((s) => `<span class="synergy-chip active">${s.name}</span>`),
-    ...sets.map((s) => `<span class="synergy-chip set">${s.label}</span>`),
-  ];
+  
   if (!state.bossUnlocked) {
-    els.synergyBar.innerHTML = '<span class="synergy-chip muted">Неизвестно</span>';
-  } else {
-    els.synergyBar.innerHTML = parts.join("") || '<span class="synergy-chip muted">Нет синергий</span>';
+    els.synergyBar.innerHTML = '<span class="synergy-chip muted">Секретно</span>';
+    return;
   }
+
+  els.synergyBar.innerHTML = "";
+  if (active.length === 0 && sets.length === 0) {
+    els.synergyBar.innerHTML = '<span class="synergy-chip muted">Нет синергий</span>';
+    return;
+  }
+
+  active.forEach(s => {
+    const el = document.createElement("span");
+    el.className = "synergy-chip active synergy-item";
+    el.textContent = s.name;
+    const desc = Object.entries(s.bonus).map(([k, v]) => `+${v} ${statLabels[k] || k}`).join(", ");
+    el.dataset.title = s.name;
+    el.dataset.desc = desc;
+    els.synergyBar.appendChild(el);
+  });
+
+  sets.forEach(s => {
+    const el = document.createElement("span");
+    el.className = "synergy-chip set synergy-item";
+    el.textContent = s.label;
+    const desc = Object.entries(s.bonus).map(([k, v]) => `+${v} ${statLabels[k] || k}`).join(", ");
+    el.dataset.title = s.label;
+    el.dataset.desc = desc;
+    els.synergyBar.appendChild(el);
+  });
 }
 
 function renderEnemyPack() {
@@ -349,6 +377,11 @@ function renderHands() {
   const weapon = state.inventory.weapon;
   const offhand = state.inventory.talisman;
   const cls = state.heroClass || "knight";
+  
+  const handsContainer = document.getElementById("playerHands");
+  if (handsContainer) {
+    handsContainer.className = `player-hands class-${cls}`;
+  }
   
   // Hand rendering
   const v = 28; // bump cache buster
@@ -505,6 +538,38 @@ export function updateOverlays() {
   }
 }
 
+function initSeamlessVideo(el1, el2) {
+  if (!el1 || !el2) return;
+  
+  // Cleanup previous listeners
+  if (el1.handleTimeUpdate) el1.removeEventListener("timeupdate", el1.handleTimeUpdate);
+  if (el2.handleTimeUpdate) el2.removeEventListener("timeupdate", el2.handleTimeUpdate);
+
+  let isFading = false;
+  
+  const createListener = (current, next) => {
+    const listener = () => {
+      if (current.duration && current.currentTime >= current.duration - 1.0 && !isFading) {
+        isFading = true;
+        next.src = current.src;
+        next.currentTime = 0;
+        next.style.opacity = 1;
+        next.play().catch(e => console.error(e));
+        current.style.opacity = 0;
+        
+        setTimeout(() => {
+          isFading = false;
+        }, 1000);
+      }
+    };
+    current.handleTimeUpdate = listener;
+    return listener;
+  };
+
+  el1.addEventListener("timeupdate", createListener(el1, el2));
+  el2.addEventListener("timeupdate", createListener(el2, el1));
+}
+
 export function render() {
   normalizeState(state);
   const heroStats = getHeroStats();
@@ -515,6 +580,7 @@ export function render() {
 
   const bgEl = document.getElementById("roadSceneBg");
   const locationVideo = document.getElementById("locationVideo");
+  const locationVideo2 = document.getElementById("locationVideo2");
   if (els.roadScene && els.roadScene.dataset.bgTint !== location.tint) {
     els.roadScene.dataset.bgTint = location.tint;
     if (bgEl) bgEl.style.backgroundImage = `url('./assets/locations/${location.tint}.png')`;
@@ -524,11 +590,26 @@ export function render() {
     const videoFile = locationVideoMap[location.name];
     if (videoFile) {
       const src = `./assets/locations/${videoFile}`;
-      if (locationVideo.getAttribute("src") !== src) {
+      if (locationVideo.dataset.currentLocation !== src) {
+        locationVideo.dataset.currentLocation = src;
         locationVideo.src = src;
-        locationVideo.load();
+        locationVideo.currentTime = 0;
+        locationVideo.style.opacity = 1;
+        if (locationVideo2) {
+          locationVideo2.src = src;
+          locationVideo2.style.opacity = 0;
+        }
+        initSeamlessVideo(locationVideo, locationVideo2);
       }
-      locationVideo.style.display = "block";
+      
+      const shouldPause = (state.currentEnemy || state.currentDialogue || state.paused || state.awaitingEvent);
+      if (shouldPause) {
+        if (!locationVideo.paused) locationVideo.pause();
+        if (locationVideo2 && !locationVideo2.paused) locationVideo2.pause();
+      } else {
+        if (locationVideo.paused && locationVideo.style.opacity === "1") locationVideo.play();
+        if (locationVideo2 && locationVideo2.paused && locationVideo2.style.opacity === "1") locationVideo2.play();
+      }
     } else {
       locationVideo.src = "";
       locationVideo.style.display = "none";
@@ -598,8 +679,16 @@ export function render() {
   if (els.goldValue) els.goldValue.textContent = state.gold;
   if (els.upgradeCount) els.upgradeCount.textContent = state.upgrades;
   if (els.starCount) els.starCount.textContent = state.stars;
+  if (els.psycheHumanity) els.psycheHumanity.textContent = state.psyche?.humanity || 0;
+  if (els.psycheLoyalty) els.psycheLoyalty.textContent = state.psyche?.loyalty || 0;
+  if (els.psycheDoubt) els.psycheDoubt.textContent = state.psyche?.doubt || 0;
   if (els.heavenSouls) els.heavenSouls.textContent = `${state.heavenSouls} / 5`;
   if (els.hellSouls) els.hellSouls.textContent = `${state.hellSouls} / 5`;
+  
+  const craftIronCount = document.getElementById("craftIronCount");
+  const craftDustCount = document.getElementById("craftDustCount");
+  if (craftIronCount) craftIronCount.textContent = state.resources?.iron || 0;
+  if (craftDustCount) craftDustCount.textContent = state.resources?.soulDust || 0;
 
   // Hide or disable boss actions based on unlocks
   const bossActions = document.querySelector('.boss-actions');

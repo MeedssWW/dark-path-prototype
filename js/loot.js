@@ -72,16 +72,12 @@ function rollRarity(sector, bonusLuck = 0, lootBias = null) {
   return rarities[0];
 }
 
-export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) {
-  const slot = slots[Math.floor(Math.random() * slots.length)];
+export function generateItem(slotKey, itemLevel, rarityKey) {
+  const slot = slots.find(s => s.key === slotKey) || slots[0];
   const type = rollItemType(slot.key);
-  const rarity = rollRarity(state.sector + (forceBoss ? 18 : 0), bonusLuck, lootBias);
+  const rarity = rarities.find(r => r.key === rarityKey) || rarities[0];
   
-  const baseLevel = state.sector * 10;
-  const levelVariance = Math.floor(Math.random() * 5);
-  const itemLevel = Math.max(1, baseLevel + levelVariance);
-  
-  const power = rarity.power * (itemLevel / 10 + 1) * (forceBoss ? 1.25 : 1);
+  const power = rarity.power * (itemLevel / 10 + 1);
   
   const item = {
     id: crypto.randomUUID(),
@@ -98,14 +94,12 @@ export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) 
   const allStats = ["damage", "health", "armor", "accuracy", "combo", "crit", "evasion", "lifeSteal", "bleed"];
   const chosenStats = [];
   
-  // First pick slot-specific stats
   for (const s of slot.stats) {
     if (chosenStats.length < rarity.stats) {
       chosenStats.push(s);
     }
   }
   
-  // If we need more stats, pick from the remaining pool
   const remainingPool = allStats.filter(s => !chosenStats.includes(s));
   while (chosenStats.length < rarity.stats && remainingPool.length > 0) {
     const idx = Math.floor(Math.random() * remainingPool.length);
@@ -114,11 +108,46 @@ export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) 
   }
   
   chosenStats.forEach((stat, index) => {
-    const isMajor = index === 0; // First stat is major
+    const isMajor = index === 0;
     item.stats[stat] = statRoll(stat, power, isMajor);
   });
   
   return item;
+}
+
+export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) {
+  const iron = Math.floor(Math.random() * 3) + (forceBoss ? 10 : 1);
+  const soulDust = forceBoss ? (Math.floor(Math.random() * 3) + 2) : (Math.random() > 0.7 ? 1 : 0);
+  
+  return {
+    isResource: true,
+    iron,
+    soulDust
+  };
+}
+
+export function generateLootHtml(item) {
+  if (!item) return "";
+  if (item.isResource) {
+    let html = `<div class="loot-card resource-loot" style="display:flex; flex-direction:column; align-items:center; gap:10px;">`;
+    html += `<h4>Ресурсы найдены:</h4>`;
+    if (item.iron) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/iron.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;"><span>Обломки железа: +${item.iron}</span></div>`;
+    if (item.soulDust) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/soul_dust.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;"><span>Пыль душ: +${item.soulDust}</span></div>`;
+    html += `</div>`;
+    return html;
+  }
+  let html = `<div class="loot-card ${item.rarity.key}">`;
+  html += `<h4>${item.name} <small>Ур.${item.level}</small></h4>`;
+  html += `<p class="rarity">${item.rarity.name} ${item.slotName}</p>`;
+  html += `<div class="stats">`;
+  for (const [key, val] of Object.entries(item.stats)) {
+    const isPercent = percentStats.has(key);
+    html += `<div><span>${statLabels[key]}</span><span>+${isPercent ? `${Math.round(val * 100)}%` : Math.round(val)}</span></div>`;
+  }
+  html += `</div>`;
+  html += `<div class="value">${item.value} G</div>`;
+  html += `</div>`;
+  return html;
 }
 
 export function itemScore(item) {
@@ -163,31 +192,47 @@ export function compareItems(item, current) {
 
 export function equipPendingLoot() {
   if (!state.pendingLoot) return;
-  const old = state.inventory[state.pendingLoot.slot];
-  if (old) state.gold += Math.floor(old.value * 0.45);
-  state.inventory[state.pendingLoot.slot] = state.pendingLoot;
-  addLog(state, `Надет предмет: ${state.pendingLoot.name}.`);
+  
+  if (state.pendingLoot.isResource) {
+    if (!state.resources) state.resources = { iron: 0, soulDust: 0 };
+    if (state.pendingLoot.iron) state.resources.iron = (state.resources.iron || 0) + state.pendingLoot.iron;
+    if (state.pendingLoot.soulDust) state.resources.soulDust = (state.resources.soulDust || 0) + state.pendingLoot.soulDust;
+    addLog(state, `Ресурсы собраны: Железо (${state.pendingLoot.iron}), Пыль (${state.pendingLoot.soulDust || 0}).`);
+  } else {
+    const old = state.inventory[state.pendingLoot.slot];
+    if (old) state.gold += Math.floor(old.value * 0.45);
+    state.inventory[state.pendingLoot.slot] = state.pendingLoot;
+    addLog(state, `Надет предмет: ${state.pendingLoot.name}.`);
+  }
+  
   state.pendingLoot = null;
   updateEpicStat();
 }
 
 export function sellPendingLoot() {
   if (!state.pendingLoot) return;
+  
+  if (state.pendingLoot.isResource) {
+    equipPendingLoot();
+    return;
+  }
+  
   state.gold += state.pendingLoot.value;
-  addLog(state, `Предмет продан за ${state.pendingLoot.value} G.`);
+  addLog(state, `Продано за ${state.pendingLoot.value} G.`);
   state.pendingLoot = null;
 }
 
 export function rerollPendingLoot() {
-  if (!state.pendingLoot) return;
+  if (!state.pendingLoot) return false;
+  if (state.pendingLoot.isResource) return false;
+  
   const cost = rerollCost();
   if (state.gold < cost) {
-    addLog(state, `Не хватает золота для перековки (${cost} G).`);
+    addLog(state, `Не хватает золота для реролла (${cost} G).`);
     return false;
   }
   state.gold -= cost;
-  const wasBoss = state.pendingLoot.rarity.power >= 3;
-  state.pendingLoot = generateLoot(wasBoss, 0.5);
-  addLog(state, `Предмет перекован за ${cost} G.`);
+  state.pendingLoot = generateItem("weapon", state.sector * 10, "common"); 
+  addLog(state, `Реролл за ${cost} G.`);
   return true;
 }

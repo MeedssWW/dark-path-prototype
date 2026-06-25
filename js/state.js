@@ -24,7 +24,7 @@ export const defaultState = {
   journalEntries: [],
   storyFlags: {},
   psyche: { loyalty: 0, doubt: 0, humanity: 0 },
-  awaitingEvent: false,
+  awaitingEvent: false, currentDialogue: null, storyAffinity: {},
   currentEvent: null,
   currentEnemy: null,
   enemyGroup: [],
@@ -152,13 +152,14 @@ function countRaritySlots(inventory, minKey) {
   return Object.values(inventory).filter((item) => order.indexOf(item.rarity.key) >= minIdx).length;
 }
 
-export function getActiveSynergies(stats) {
-  return synergyDefs.filter((syn) =>
-    Object.entries(syn.needs).every(([key, need]) => {
+export function getActiveSynergies(stats, heroClass) {
+  return synergyDefs.filter((syn) => {
+    if (syn.classReq && syn.classReq !== heroClass) return false;
+    return Object.entries(syn.needs).every(([key, need]) => {
       const val = stats[key] || 0;
       return val >= need;
-    })
-  );
+    });
+  });
 }
 
 export function getSetBonuses(inventory) {
@@ -183,23 +184,23 @@ export function getSetBonuses(inventory) {
 
 export function getHeroStats(s = state) {
   const cls = heroClasses.find((c) => c.key === s.heroClass);
-  const base = {
-    damage: 18 + s.upgrades * 2.4,
-    health: 120 + s.upgrades * 14,
-    combo: 0.11 + s.stars * 0.015,
-    armor: 7 + s.upgrades * 0.55,
-    crit: 0.08 + s.stars * 0.012,
-    evasion: 0.06,
-    accuracy: 0.86,
-    lifeSteal: 0.02,
-    bleed: 0.06,
-  };
+  const defaultBase = { health: 120, damage: 10, armor: 5, combo: 0.1, crit: 0.05, evasion: 0.05, accuracy: 0.85, lifeSteal: 0, bleed: 0 };
+  const defaultScale = { health: 10, damage: 1, armor: 0.5 };
+  
+  const cBase = cls?.base || defaultBase;
+  const cScale = cls?.scaling || defaultScale;
 
-  if (cls?.bonuses) {
-    Object.entries(cls.bonuses).forEach(([key, value]) => {
-      base[key] = (base[key] || 0) + value;
-    });
-  }
+  const base = {
+    health: cBase.health + s.upgrades * cScale.health,
+    damage: cBase.damage + s.upgrades * cScale.damage,
+    armor: cBase.armor + s.upgrades * cScale.armor,
+    combo: cBase.combo + s.stars * 0.015,
+    crit: cBase.crit + s.stars * 0.012,
+    evasion: cBase.evasion,
+    accuracy: cBase.accuracy,
+    lifeSteal: cBase.lifeSteal,
+    bleed: cBase.bleed,
+  };
 
   Object.values(s.inventory).forEach((item) => {
     Object.entries(item.stats).forEach(([key, value]) => {
@@ -213,7 +214,7 @@ export function getHeroStats(s = state) {
   });
 
   const preClamp = { ...base };
-  getActiveSynergies(preClamp).forEach((syn) => {
+  getActiveSynergies(preClamp, s.heroClass).forEach((syn) => {
     Object.entries(syn.bonus).forEach(([key, value]) => {
       base[key] = (base[key] || 0) + value;
     });

@@ -12,9 +12,11 @@ import {
 } from "./state.js";
 import { generateLoot } from "./loot.js";
 import { startEvent, sendSoul } from "./events.js";
+import { startDialogue } from "./dialogue.js";
 import { audio } from "./audio.js";
 import { showFloatingNumber, showEnemyEffect, flashStarBurst } from "./fx.js";
 import { checkMilestones, showMilestoneToast } from "./milestones.js";
+import { triggerHeroAttackAnim } from "./render.js";
 
 export function rollEnemyCount(sector) {
   if (sector < 8) return 1;
@@ -145,7 +147,7 @@ export function spawnEnemy(s = state, elite = false, bossSide = null) {
 }
 
 export function maybeNextEncounter() {
-  if (state.currentEnemy || getAliveEnemies().length || state.awaitingEvent || state.pendingLoot) return;
+  if (state.currentEnemy || getAliveEnemies().length || state.awaitingEvent || state.pendingLoot || state.currentDialogue) return;
 
   const prevSector = state.sector;
   if (state.encounter >= 5) {
@@ -165,6 +167,33 @@ export function maybeNextEncounter() {
       audio.playMilestone();
     }
     checkMilestones(state);
+  }
+
+  // --- STORY DIALOGUE TRIGGERS ---
+  if (state.encounter === 0 && !state.currentDialogue) {
+    if (state.sector === 1 && !state.stats.metOldMan) {
+      state.stats.metOldMan = true;
+      startDialogue("old_man");
+      return;
+    }
+    if (state.sector === 4 && !state.stats.metElara) {
+      state.stats.metElara = true;
+      startDialogue("elara");
+      return;
+    }
+    if (state.sector === 8 && !state.stats.metGarrick) {
+      state.stats.metGarrick = true;
+      startDialogue("garrick");
+      return;
+    }
+    if (state.sector === 10 && !state.stats.metSideNPC) {
+      state.stats.metSideNPC = true;
+      const roll = Math.random();
+      if (roll < 0.33) startDialogue("dying_soldier");
+      else if (roll < 0.66) startDialogue("blind_witch");
+      else startDialogue("looter");
+      return;
+    }
   }
 
   const eventChanceBase = state.encounter === 4 ? BALANCE.eventChanceLast : BALANCE.eventChance;
@@ -199,6 +228,7 @@ export function reviveAtSectorStart(heroStats) {
 }
 
 export function heroAttack(heroStats) {
+  triggerHeroAttackAnim();
   let swings = 0;
   do {
     swings += 1;
@@ -234,13 +264,53 @@ export function heroAttack(heroStats) {
 
       const need = starHitsRequired();
       if (state.stars > 0 && state.starHits >= need) {
-        const burst = Math.round(heroStats.damage * (1.25 + state.stars * 0.25));
-        enemy.hp -= burst;
         state.starHits = 0;
-        addLog(state, `Звездная способность: ${burst} урона.`);
-        showFloatingNumber(`⭐ ${burst}`, "star", "enemy");
         flashStarBurst();
         audio.playStar();
+        
+        switch (state.heroClass) {
+          case "dark_knight": {
+            const bashDmg = Math.round((heroStats.armor || 10) * (2 + state.stars * 0.5));
+            enemy.hp -= bashDmg;
+            state.buffs.armor = (state.buffs.armor || 0) + 0.1 * state.stars;
+            addLog(state, `УДАР ЩИТОМ! ${bashDmg} урона. Броня усилена.`);
+            showFloatingNumber(`🛡️ ${bashDmg}`, "star", "enemy");
+            break;
+          }
+          case "hunter": {
+            const bleedDmg = Math.round(heroStats.damage * (1 + state.stars * 0.5));
+            enemy.bleedStacks.push({ ticks: 4, damage: bleedDmg });
+            const healFrenzy = Math.round(bleedDmg * 2);
+            state.heroHp = Math.min(heroStats.health, state.heroHp + healFrenzy);
+            addLog(state, `КРОВАВОЕ БЕЗУМИЕ! Мощное кровотечение и +${healFrenzy} HP.`);
+            showFloatingNumber(`🩸 Безумие`, "star", "enemy");
+            showFloatingNumber(`+${healFrenzy}`, "heal", "hero");
+            break;
+          }
+          case "cultist": {
+            const sacHp = Math.round(state.heroHp * 0.1);
+            if (state.heroHp > sacHp + 1) {
+              state.heroHp -= sacHp;
+              const sacDmg = Math.round((sacHp + heroStats.damage) * (3 + state.stars));
+              enemy.hp -= sacDmg;
+              addLog(state, `ТЕМНАЯ ЖЕРТВА! -${sacHp} HP ради ${sacDmg} урона!`);
+              showFloatingNumber(`🔮 ${sacDmg}`, "star", "enemy");
+              showFloatingNumber(`-${sacHp}`, "normal", "hero");
+            } else {
+              const burst = Math.round(heroStats.damage * (1.25 + state.stars * 0.25));
+              enemy.hp -= burst;
+              addLog(state, `Слабый взрыв: ${burst} урона (мало ХП для жертвы).`);
+              showFloatingNumber(`💥 ${burst}`, "star", "enemy");
+            }
+            break;
+          }
+          default: {
+            const burst = Math.round(heroStats.damage * (1.25 + state.stars * 0.25));
+            enemy.hp -= burst;
+            addLog(state, `Звёздная способность: ${burst} урона.`);
+            showFloatingNumber(`💥 ${burst}`, "star", "enemy");
+          }
+        }
       }
       addLog(state, `${crit ? "Крит" : "Удар"}: ${dmg}${heal ? `, +${heal} HP` : ""}.`);
     }
@@ -327,23 +397,10 @@ export function defeatEnemy() {
     state[`${bossSide}Souls`] = 0;
     state.stats[`${bossSide}Bosses`] = (state.stats[`${bossSide}Bosses`] || 0) + 1;
     state.pendingLoot = generateLoot(true, 0, bossSide);
-    addLog(state, "Босс оставил редкую добычу.");
+    addLog(state, "Босс оставил ресурсы.");
     audio.playLoot();
     checkMilestones(state);
   } else {
-    if (Math.random() < 0.2) {
-      state.awaitingEvent = true;
-      state.currentEvent = {
-        kind: "Душа",
-        title: "Из тела врага вышла душа",
-        text: "Рай — исцеление и точность. Ад — урон и кровотечение.",
-        countsEncounter: false,
-        choices: [
-          { label: "В Рай", effectKey: "soul_heaven" },
-          { label: "В Ад", effectKey: "soul_hell" },
-        ],
-      };
-    }
     if (!state.pendingLoot && Math.random() < 0.58) {
       state.pendingLoot = generateLoot(false);
       audio.playLoot();
