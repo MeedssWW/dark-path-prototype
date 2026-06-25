@@ -448,7 +448,8 @@ function renderLoot() {
 
   if (els.lootIcon) {
     const iconKey = item.visual || item.type?.visual || item.slot || "iron";
-    const iconSrc = `./assets/equipment/${iconKey}.png`;
+    const dir = item.isResource ? "items" : "equipment";
+    const iconSrc = `./assets/${dir}/${iconKey}.png`;
     els.lootIcon.className = 'item-icon-img large';
     els.lootIcon.innerHTML = `<img src="${iconSrc}" alt="${item.name}" onerror="this.style.display='none'">`;
     els.lootIcon.style.cssText = `border-color: ${item.rarity?.color || '#fff'}55; box-shadow: 0 0 20px ${item.rarity?.color || '#fff'}33;`;
