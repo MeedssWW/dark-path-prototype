@@ -545,7 +545,6 @@ function init() {
         localStorage.removeItem("dark-path-prototype-save-v1");
         combatAnimating = false;
         setState(structuredClone(defaultState));
-        tutorialIndex = 0;
         audio.forcePlay(els.musicPlayer, els.audioToggle);
         startTickLoop();
         render();
