@@ -179,29 +179,44 @@ function renderCinematicSlide() {
   const slide = cinematicSlides[currentSlideIndex];
   textEl.textContent = slide.text;
 
+  const finishSlideRender = () => {
+    // 1) Open eyes shortly after ready
+    cinematicTimeout1 = setTimeout(() => {
+      if (eyelidTop) eyelidTop.style.height = "0%";
+      if (eyelidBottom) eyelidBottom.style.height = "0%";
+      
+      // 2) Show text and hint (2s after eyes open)
+      cinematicTimeout2 = setTimeout(() => {
+        textEl.style.opacity = "1";
+        if (nextHint) nextHint.style.opacity = "1";
+      }, 2000);
+    }, 100);
+  };
+
   if (slide.type === "image") {
     vid.style.display = "none";
     vid.pause();
-    img.src = slide.src;
     img.style.display = "block";
+    
+    let loaded = false;
+    const handleLoad = () => {
+      if (loaded) return;
+      loaded = true;
+      finishSlideRender();
+    };
+    
+    img.onload = handleLoad;
+    img.onerror = handleLoad;
+    img.src = slide.src;
+    
+    if (img.complete) handleLoad();
   } else {
     img.style.display = "none";
     vid.src = slide.src;
     vid.style.display = "block";
-    vid.play();
+    vid.play().catch(console.error);
+    finishSlideRender();
   }
-
-  // 1) Open eyes (0.5s delay)
-  cinematicTimeout1 = setTimeout(() => {
-    eyelidTop.style.height = "0%";
-    eyelidBottom.style.height = "0%";
-    
-    // 2) Show text and hint (2s after eyes open)
-    cinematicTimeout2 = setTimeout(() => {
-      textEl.style.opacity = "1";
-      if (nextHint) nextHint.style.opacity = "1";
-    }, 2000);
-  }, 500);
 }
 
 function showActTitle() {
