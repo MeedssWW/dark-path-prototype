@@ -412,7 +412,6 @@ body[data-location="abyss"] .stage-sky {
   height: 100%;
   object-fit: cover;
   z-index: 1;
-  display: none;
 }
 
 .road-scene.hero-attack {

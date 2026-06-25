@@ -173,25 +173,25 @@ export function maybeNextEncounter() {
   if (state.encounter === 0 && !state.currentDialogue && !state.pendingDialogue) {
     if (state.sector === 1 && !state.stats.metOldMan) {
       state.stats.metOldMan = true;
-      state.walkDelay = Date.now() + 5000;
+      state.walkDelay = Date.now() + 2500;
       state.pendingDialogue = "old_man";
       return;
     }
     if (state.sector === 4 && !state.stats.metElara) {
       state.stats.metElara = true;
-      state.walkDelay = Date.now() + 5000;
+      state.walkDelay = Date.now() + 2500;
       state.pendingDialogue = "elara";
       return;
     }
     if (state.sector === 8 && !state.stats.metGarrick) {
       state.stats.metGarrick = true;
-      state.walkDelay = Date.now() + 5000;
+      state.walkDelay = Date.now() + 2500;
       state.pendingDialogue = "garrick";
       return;
     }
     if (state.sector === 10 && !state.stats.metSideNPC) {
       state.stats.metSideNPC = true;
-      state.walkDelay = Date.now() + 5000;
+      state.walkDelay = Date.now() + 2500;
       const roll = Math.random();
       if (roll < 0.33) state.pendingDialogue = "dying_soldier";
       else if (roll < 0.66) state.pendingDialogue = "blind_witch";
