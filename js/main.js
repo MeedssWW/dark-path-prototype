@@ -187,31 +187,30 @@ function renderCinematicSlide() {
       if (eyelidTop) eyelidTop.style.height = "0%";
       if (eyelidBottom) eyelidBottom.style.height = "0%";
       
-      // 2) Show text and hint (2s after eyes open)
+      // 2) Show text and hint (0.5s after eyes open)
       cinematicTimeout2 = setTimeout(() => {
         textEl.style.opacity = "1";
         if (nextHint) nextHint.style.opacity = "1";
-      }, 2000);
+      }, 500);
     }, 100);
   };
 
   if (slide.type === "image") {
     vid.style.display = "none";
     vid.pause();
-    img.style.display = "block";
-    
     let loaded = false;
     const handleLoad = () => {
       if (loaded) return;
       loaded = true;
+      img.src = slide.src;
+      img.style.display = "block";
       finishSlideRender();
     };
     
-    img.onload = handleLoad;
-    img.onerror = handleLoad;
-    img.src = slide.src;
-    
-    if (img.complete) handleLoad();
+    const preloader = new Image();
+    preloader.onload = handleLoad;
+    preloader.onerror = handleLoad;
+    preloader.src = slide.src;
   } else {
     img.style.display = "none";
     vid.src = slide.src;
@@ -270,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         currentSlideIndex++;
         renderCinematicSlide();
-      }, 800); // wait for fade to black
+      }, 650); // Wait for eyes to fully close
     });
   }
 });

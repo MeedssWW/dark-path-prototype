@@ -433,8 +433,6 @@ function renderLoot() {
     return;
   }
   const item = state.pendingLoot;
-  const current = state.inventory[item.slot];
-  const comparison = compareItems(item, current);
   els.lootCard?.classList.remove("hidden");
   if (els.lootCard && els.lootCard.dataset.itemId !== item.id) {
     els.lootCard.dataset.itemId = item.id;
@@ -442,17 +440,34 @@ function renderLoot() {
     void els.lootCard.offsetWidth;
     els.lootCard.classList.add("loot-drop");
   }
+
   if (els.lootName) {
     els.lootName.textContent = item.name;
-    els.lootName.style.color = item.rarity.color;
+    els.lootName.style.color = item.rarity?.color || "#fff";
   }
+
   if (els.lootIcon) {
-    const iconKey = item.type?.visual || item.slot;
+    const iconKey = item.visual || item.type?.visual || item.slot || "iron";
     const iconSrc = `./assets/equipment/${iconKey}.png`;
     els.lootIcon.className = 'item-icon-img large';
-    els.lootIcon.innerHTML = `<img src="${iconSrc}" alt="${item.type?.name || item.slot}" onerror="this.style.display='none'">`;
-    els.lootIcon.style.cssText = `border-color: ${item.rarity.color}55; box-shadow: 0 0 20px ${item.rarity.color}33;`;
+    els.lootIcon.innerHTML = `<img src="${iconSrc}" alt="${item.name}" onerror="this.style.display='none'">`;
+    els.lootIcon.style.cssText = `border-color: ${item.rarity?.color || '#fff'}55; box-shadow: 0 0 20px ${item.rarity?.color || '#fff'}33;`;
   }
+
+  if (item.isResource) {
+    if (els.lootRarityBadge) {
+      els.lootRarityBadge.textContent = "Ресурс";
+      els.lootRarityBadge.style.borderColor = "#aaa";
+      els.lootRarityBadge.style.color = "#aaa";
+    }
+    if (els.lootStats) els.lootStats.innerHTML = `<span style="color:var(--gold);">Получено: ${item.iron ? item.iron + " Железа" : item.soulDust + " Пыли душ"}</span>`;
+    if (els.lootCompare) els.lootCompare.innerHTML = `<div class="compare-verdict equal">Полезно для улучшения снаряжения</div>`;
+    return;
+  }
+
+  const current = state.inventory[item.slot];
+  const comparison = compareItems(item, current);
+
   if (els.lootRarityBadge) {
     els.lootRarityBadge.textContent = item.rarity.name;
     els.lootRarityBadge.style.borderColor = item.rarity.color;
