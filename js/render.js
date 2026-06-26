@@ -768,14 +768,17 @@ export function showItemDetails(slotKey) {
 }
 
 export function triggerHeroAttackAnim() {
-  const container = els.realRightArm?.parentElement;
+  const container = document.querySelector(".real-hand-right");
   if (container) {
-    container.classList.remove('attacking-right-arm');
-    void container.offsetWidth; // trigger reflow
-    container.classList.add('attacking-right-arm');
-    setTimeout(() => {
-      if (container) container.classList.remove('attacking-right-arm');
-    }, 450);
+    container.style.animation = 'none';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        container.style.animation = 'fp-attack-swipe 0.45s cubic-bezier(0.1, 0.9, 0.2, 1) forwards';
+        setTimeout(() => {
+          if (container) container.style.animation = '';
+        }, 450);
+      });
+    });
   }
 }
 

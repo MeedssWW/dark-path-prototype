@@ -50,8 +50,11 @@ async function combatTick() {
     } else {
       state.walkDelay = 0;
       if (state.pendingDialogue) {
-        import("./dialogue.js").then(({ startDialogue }) => startDialogue(state.pendingDialogue));
-        state.pendingDialogue = null;
+        const diag = state.pendingDialogue;
+        import("./dialogue.js").then(({ startDialogue }) => {
+          startDialogue(diag);
+          state.pendingDialogue = null;
+        });
         return render();
       }
     }

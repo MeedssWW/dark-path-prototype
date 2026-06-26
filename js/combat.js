@@ -147,7 +147,7 @@ export function spawnEnemy(s = state, elite = false, bossSide = null) {
 }
 
 export function maybeNextEncounter() {
-  if (state.currentEnemy || getAliveEnemies().length || state.awaitingEvent || state.pendingLoot || state.currentDialogue) return;
+  if (state.currentEnemy || getAliveEnemies().length || state.awaitingEvent || state.pendingLoot || state.currentDialogue || state.pendingDialogue) return;
 
   const prevSector = state.sector;
   if (state.encounter >= 5) {
