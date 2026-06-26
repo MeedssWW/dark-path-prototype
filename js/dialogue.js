@@ -112,11 +112,18 @@ function selectChoice(opt) {
     if (opt.stats.humanity) state.psyche.humanity += opt.stats.humanity;
   }
   
-  // Apply affinity
+  // Apply affinity and check for early termination
   if (opt.affinity !== undefined) {
     const npc = state.currentDialogue.npc;
     if (!state.storyAffinity) state.storyAffinity = {};
     state.storyAffinity[npc] = (state.storyAffinity[npc] || 0) + opt.affinity;
+    
+    // Early termination: <= -3 combat, < 0 angry exit
+    if (state.storyAffinity[npc] <= -3 && !opt.next.startsWith("EXIT") && opt.next !== "COMBAT") {
+      opt.next = state.currentDialogue.data['combat_exit'] ? 'combat_exit' : 'COMBAT';
+    } else if (state.storyAffinity[npc] < 0 && !opt.next.startsWith("EXIT") && opt.next !== "COMBAT") {
+      opt.next = state.currentDialogue.data['angry_exit'] ? 'angry_exit' : 'EXIT';
+    }
   }
   
   // Cost (e.g. gold)
