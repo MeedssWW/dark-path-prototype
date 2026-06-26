@@ -664,15 +664,28 @@ export function render() {
         els.enemyImage.style.display = 'block';
       };
     }
-    if (els.enemyTraits)
-      els.enemyTraits.innerHTML = (e.traits || []).map((t) => `<span class="trait-chip">${escapeHtml(t)}</span>`).join("");
-    if (els.combatStatus) els.combatStatus.textContent = e.bossSide ? "Босс призван" : e.elite ? "Элитный бой" : "Автобой";
-  } else {
-    els.enemyStage?.classList.add("hidden");
-    if (els.enemyTraits) els.enemyTraits.innerHTML = "";
-    if (els.combatStatus)
-      els.combatStatus.textContent = state.awaitingEvent ? "Выбор" : state.paused ? "Пауза" : "Поиск встречи";
-  }
+      if (els.enemyTraits) {
+        els.enemyTraits.style.display = "";
+        els.enemyTraits.innerHTML = (e.traits || []).map((t) => `<span class="trait-chip">${escapeHtml(t)}</span>`).join("");
+      }
+      if (els.combatStatus) els.combatStatus.textContent = e.bossSide ? "БИТВА С БОССОМ" : e.elite ? "ЭЛИТНЫЙ ВРАГ" : "ПРОТИВНИК";
+    } else if (state.currentDialogue) {
+      els.enemyStage?.classList.remove("hidden");
+      if (els.enemyHpText) els.enemyHpText.style.display = "none";
+      if (els.enemyHpBar && els.enemyHpBar.parentElement) els.enemyHpBar.parentElement.style.display = "none";
+      if (els.enemyTraits) els.enemyTraits.style.display = "none";
+      if (els.combatStatus) els.combatStatus.textContent = "РАЗГОВОР";
+    } else {
+      els.enemyStage?.classList.add("hidden");
+      if (els.enemyHpText) els.enemyHpText.style.display = "";
+      if (els.enemyHpBar && els.enemyHpBar.parentElement) els.enemyHpBar.parentElement.style.display = "";
+      if (els.enemyTraits) {
+        els.enemyTraits.style.display = "";
+        els.enemyTraits.innerHTML = "";
+      }
+      if (els.combatStatus)
+        els.combatStatus.textContent = state.awaitingEvent ? "СОБЫТИЕ" : state.paused ? "ПАУЗА" : "ПУТЬ СВОБОДЕН";
+    }
 
   renderEnemyPack();
   const need = starHitsRequired();

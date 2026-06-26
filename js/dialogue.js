@@ -15,7 +15,8 @@ export function startDialogue(npcKey) {
   // Trigger blink transition
   const eyelidTop = document.getElementById("eyelidTop");
   const eyelidBottom = document.getElementById("eyelidBottom");
-  const dialogueOverlay = document.getElementById("dialogueOverlay");
+  const equipSection = document.getElementById("equipSection");
+  const dialogueSection = document.getElementById("dialogueSection");
   
   if (eyelidTop && eyelidBottom) {
     eyelidTop.style.height = "50%";
@@ -27,13 +28,15 @@ export function startDialogue(npcKey) {
     
     setTimeout(() => {
       renderDialogueNode();
-      dialogueOverlay.classList.remove("hidden");
+      if (equipSection) equipSection.classList.add("hidden");
+      if (dialogueSection) dialogueSection.classList.remove("hidden");
       eyelidTop.style.height = "0%";
       eyelidBottom.style.height = "0%";
     }, 600);
   } else {
     renderDialogueNode();
-    dialogueOverlay?.classList.remove("hidden");
+    if (equipSection) equipSection.classList.add("hidden");
+    if (dialogueSection) dialogueSection.classList.remove("hidden");
   }
 }
 
@@ -49,12 +52,28 @@ function renderDialogueNode() {
 
   const textEl = document.getElementById("dialogueText");
   const choicesEl = document.getElementById("dialogueChoices");
-  const portraitEl = document.getElementById("dialoguePortrait");
   
-  if (portraitEl) {
-    portraitEl.src = `./assets/npc/${dlg.npc}.png`;
-    portraitEl.style.display = "block";
-    portraitEl.onerror = () => { portraitEl.style.display = "none"; };
+  // Display NPC portrait in the enemy stage
+  const enemyStage = document.getElementById("enemyStage");
+  const enemyName = document.getElementById("enemyName");
+  const enemyImage = document.getElementById("enemyImage");
+  const enemyHpText = document.getElementById("enemyHpText");
+  const enemyHpBar = document.getElementById("enemyHpBar");
+  const enemyTraits = document.getElementById("enemyTraits");
+  
+  if (enemyStage && enemyImage && enemyName) {
+    enemyStage.classList.remove("hidden");
+    enemyImage.src = `./assets/npc/${dlg.npc}.png`;
+    
+    let displayName = "Незнакомец";
+    if (dlg.npc === "old_man") displayName = "Старик";
+    else if (dlg.npc === "elara") displayName = "Элара";
+    else if (dlg.npc === "garrick") displayName = "Гаррик";
+    enemyName.textContent = displayName;
+    
+    if (enemyHpText) enemyHpText.style.display = "none";
+    if (enemyHpBar && enemyHpBar.parentElement) enemyHpBar.parentElement.style.display = "none";
+    if (enemyTraits) enemyTraits.style.display = "none";
   }
   
   if (textEl) {
@@ -128,10 +147,18 @@ function selectChoice(opt) {
 }
 
 function endDialogue(triggerCombat = false) {
-  const dialogueOverlay = document.getElementById("dialogueOverlay");
-  
+  const equipSection = document.getElementById("equipSection");
+  const dialogueSection = document.getElementById("dialogueSection");
   const eyelidTop = document.getElementById("eyelidTop");
   const eyelidBottom = document.getElementById("eyelidBottom");
+  
+  // Restore enemy UI elements
+  const enemyHpText = document.getElementById("enemyHpText");
+  const enemyHpBar = document.getElementById("enemyHpBar");
+  const enemyTraits = document.getElementById("enemyTraits");
+  if (enemyHpText) enemyHpText.style.display = "";
+  if (enemyHpBar && enemyHpBar.parentElement) enemyHpBar.parentElement.style.display = "";
+  if (enemyTraits) enemyTraits.style.display = "";
   
   if (eyelidTop && eyelidBottom) {
     eyelidTop.style.height = "50%";
@@ -139,7 +166,8 @@ function endDialogue(triggerCombat = false) {
     
     setTimeout(() => {
       state.currentDialogue = null;
-      dialogueOverlay?.classList.add("hidden");
+      if (dialogueSection) dialogueSection.classList.add("hidden");
+      if (equipSection) equipSection.classList.remove("hidden");
       
       const vid = document.getElementById("locationVideo");
       if (vid && vid.paused && !state.currentEnemy) vid.play();
@@ -155,7 +183,8 @@ function endDialogue(triggerCombat = false) {
     }, 600);
   } else {
     state.currentDialogue = null;
-    dialogueOverlay?.classList.add("hidden");
+    if (dialogueSection) dialogueSection.classList.add("hidden");
+    if (equipSection) equipSection.classList.remove("hidden");
     render();
   }
 }
