@@ -670,7 +670,7 @@ export function render() {
       }
       if (els.combatStatus) els.combatStatus.textContent = e.bossSide ? "БИТВА С БОССОМ" : e.elite ? "ЭЛИТНЫЙ ВРАГ" : "ПРОТИВНИК";
     } else if (state.currentDialogue) {
-      els.enemyStage?.classList.remove("hidden");
+      els.enemyStage?.classList.add("hidden");
       if (els.enemyHpText) els.enemyHpText.style.display = "none";
       if (els.enemyHpBar && els.enemyHpBar.parentElement) els.enemyHpBar.parentElement.style.display = "none";
       if (els.enemyTraits) els.enemyTraits.style.display = "none";

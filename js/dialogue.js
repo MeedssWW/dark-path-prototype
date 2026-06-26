@@ -53,27 +53,18 @@ function renderDialogueNode() {
   const textEl = document.getElementById("dialogueText");
   const choicesEl = document.getElementById("dialogueChoices");
   
-  // Display NPC portrait in the enemy stage
-  const enemyStage = document.getElementById("enemyStage");
-  const enemyName = document.getElementById("enemyName");
-  const enemyImage = document.getElementById("enemyImage");
-  const enemyHpText = document.getElementById("enemyHpText");
-  const enemyHpBar = document.getElementById("enemyHpBar");
-  const enemyTraits = document.getElementById("enemyTraits");
+  const dialogueSceneBg = document.getElementById("dialogueSceneBg");
+  const dialogueName = document.getElementById("dialogueName");
   
-  if (enemyStage && enemyImage && enemyName) {
-    enemyStage.classList.remove("hidden");
-    enemyImage.src = `./assets/npc/${dlg.npc}.png`;
+  if (dialogueSceneBg && dialogueName) {
+    dialogueSceneBg.src = `./assets/npc/${dlg.npc}.png`;
+    dialogueSceneBg.style.display = "block";
     
     let displayName = "Незнакомец";
     if (dlg.npc === "old_man") displayName = "Старик";
     else if (dlg.npc === "elara") displayName = "Элара";
     else if (dlg.npc === "garrick") displayName = "Гаррик";
-    enemyName.textContent = displayName;
-    
-    if (enemyHpText) enemyHpText.style.display = "none";
-    if (enemyHpBar && enemyHpBar.parentElement) enemyHpBar.parentElement.style.display = "none";
-    if (enemyTraits) enemyTraits.style.display = "none";
+    dialogueName.textContent = displayName;
   }
   
   if (textEl) {
@@ -151,14 +142,7 @@ function endDialogue(triggerCombat = false) {
   const dialogueSection = document.getElementById("dialogueSection");
   const eyelidTop = document.getElementById("eyelidTop");
   const eyelidBottom = document.getElementById("eyelidBottom");
-  
-  // Restore enemy UI elements
-  const enemyHpText = document.getElementById("enemyHpText");
-  const enemyHpBar = document.getElementById("enemyHpBar");
-  const enemyTraits = document.getElementById("enemyTraits");
-  if (enemyHpText) enemyHpText.style.display = "";
-  if (enemyHpBar && enemyHpBar.parentElement) enemyHpBar.parentElement.style.display = "";
-  if (enemyTraits) enemyTraits.style.display = "";
+  const dialogueSceneBg = document.getElementById("dialogueSceneBg");
   
   if (eyelidTop && eyelidBottom) {
     eyelidTop.style.height = "50%";
@@ -168,6 +152,7 @@ function endDialogue(triggerCombat = false) {
       state.currentDialogue = null;
       if (dialogueSection) dialogueSection.classList.add("hidden");
       if (equipSection) equipSection.classList.remove("hidden");
+      if (dialogueSceneBg) dialogueSceneBg.style.display = "none";
       
       const vid = document.getElementById("locationVideo");
       if (vid && vid.paused && !state.currentEnemy) vid.play();
@@ -185,6 +170,7 @@ function endDialogue(triggerCombat = false) {
     state.currentDialogue = null;
     if (dialogueSection) dialogueSection.classList.add("hidden");
     if (equipSection) equipSection.classList.remove("hidden");
+    if (dialogueSceneBg) dialogueSceneBg.style.display = "none";
     render();
   }
 }
