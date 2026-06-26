@@ -52,6 +52,7 @@ async function combatTick() {
       if (state.pendingDialogue) {
         import("./dialogue.js").then(({ startDialogue }) => startDialogue(state.pendingDialogue));
         state.pendingDialogue = null;
+        return render();
       }
     }
   }
