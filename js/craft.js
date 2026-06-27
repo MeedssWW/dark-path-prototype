@@ -1,7 +1,7 @@
 import { state, saveState, addLog } from "./state.js";
 import { generateItem, craftSpecificItem } from "./loot.js";
 import { checkMilestones } from "./milestones.js";
-import { slots } from "./data.js";
+import { slots, statLabels, percentStats } from "./data.js";
 
 window.craftGrid = [null, null, null, null, null, null, null, null, null];
 window.selectedCraftResource = null;
@@ -198,8 +198,14 @@ window.attemptGridCraft = function() {
   if (oldItem) state.gold += Math.floor(oldItem.value * 0.45 || 10);
   state.inventory[slotKey] = item;
   
-  addLog(state, `Скрафчен предмет: ${item.name}`);
-  showCraftMsg(`Успех! Создано: ${item.name}`, item.rarity.color || "#6c4");
+  const statsTextArray = Object.entries(item.stats).map(([k, v]) => {
+    const isPercent = percentStats.has(k);
+    return `+${isPercent ? Math.round(v * 100) + '%' : Math.round(v)} ${statLabels[k] || k}`;
+  });
+  const statsText = statsTextArray.join(", ");
+  
+  addLog(state, `Скрафчен предмет: ${item.name} (${statsText})`);
+  showCraftMsg(`Успех! Создано: ${item.name} (${statsText})`, item.rarity.color || "#6c4");
   
   saveState();
   checkMilestones(state);

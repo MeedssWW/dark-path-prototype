@@ -589,6 +589,16 @@ function init() {
     }
   });
 
+  const playlist = ["./assets/analogue-winter.mp3", "./assets/hide-cs01-slowed.mp3"];
+  let currentTrackIdx = 0;
+  if (els.musicPlayer) {
+    els.musicPlayer.addEventListener("ended", () => {
+      currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
+      els.musicPlayer.src = playlist[currentTrackIdx];
+      els.musicPlayer.play().catch(e => console.warn("Playlist next track failed:", e));
+    });
+  }
+
   const synergyBar = document.getElementById("synergyBar");
   if (synergyBar) {
     synergyBar.addEventListener("click", (e) => {
