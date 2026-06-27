@@ -184,13 +184,13 @@ window.attemptGridCraft = function() {
   }
 
   // Add directly to inventory
-  const old = state.inventory[item.slotName]; // wait, slotName is localized. We need slotKey.
-  // Actually craftSpecificItem needs to return slotKey. I will fix that in attemptGridCraft by looking up the slot key.
-  let slotKey = Object.keys(slots).find(k => slots[k]?.name === item.slotName);
-  if (!slotKey) {
-     // fallback search
-     const foundSlot = slots.find(s => s.name === item.slotName);
-     if (foundSlot) slotKey = foundSlot.key;
+  let slotKey = null;
+  const foundSlot = slots.find(s => s.name === item.slotName);
+  if (foundSlot) {
+     slotKey = foundSlot.key;
+  } else {
+     // fallback if not found
+     slotKey = "weapon";
   }
   item.slot = slotKey;
 

@@ -116,12 +116,27 @@ export function generateItem(slotKey, itemLevel, rarityKey) {
 }
 
 export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) {
-  const iron = Math.floor(Math.random() * 3) + (forceBoss ? 10 : 1);
-  const soulDust = forceBoss ? (Math.floor(Math.random() * 3) + 2) : (Math.random() > 0.7 ? 1 : 0);
-  const bone = Math.random() > 0.6 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
-  const resin = Math.random() > 0.6 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
-  const reagent = Math.random() > 0.75 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
-  const wood = Math.random() > 0.5 ? Math.floor(Math.random() * 3) + (forceBoss ? 3 : 1) : 0;
+  let iron = 0, soulDust = 0, bone = 0, resin = 0, reagent = 0, wood = 0;
+  
+  if (forceBoss) {
+    iron = Math.floor(Math.random() * 3) + 10;
+    soulDust = Math.floor(Math.random() * 3) + 2;
+    bone = Math.floor(Math.random() * 2) + 2;
+    resin = Math.floor(Math.random() * 2) + 2;
+    reagent = Math.floor(Math.random() * 2) + 2;
+    wood = Math.floor(Math.random() * 3) + 3;
+  } else {
+    // Pick 1 random resource type for regular mobs
+    const resTypes = ["iron", "iron", "wood", "wood", "soulDust", "bone", "resin", "reagent"];
+    const chosen = resTypes[Math.floor(Math.random() * resTypes.length)];
+    const amt = Math.floor(Math.random() * 2) + 1;
+    if (chosen === "iron") iron = amt;
+    else if (chosen === "wood") wood = amt;
+    else if (chosen === "soulDust") soulDust = 1;
+    else if (chosen === "bone") bone = 1;
+    else if (chosen === "resin") resin = 1;
+    else if (chosen === "reagent") reagent = 1;
+  }
   
   const recipeDrops = [
     "iron_sword_common", "iron_axe_common", "iron_dagger_common", 
