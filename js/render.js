@@ -6,6 +6,7 @@ import {
   itemEmojis,
   heroClasses,
   artifacts,
+  synergyDefs,
 } from "./data.js";
 import {
   state,
@@ -18,9 +19,9 @@ import {
   getSetBonuses,
   clamp,
   starHitsRequired,
+  getAliveEnemies,
 } from "./state.js";
 import { getDropWeights, compareItems, formatStatValue } from "./loot.js";
-import { getAliveEnemies } from "./state.js";
 import { runEventEffect, finishEvent } from "./events.js";
 
 import { setSpeedMultiplier as setFxSpeed, initFx, setCombatStatus } from "./fx.js";
@@ -261,7 +262,7 @@ function renderBuffBar() {
 
 function renderSynergyBar(heroStats) {
   if (!els.synergyBar) return;
-  const active = getActiveSynergies(heroStats, state.heroClass);
+  const active = getActiveSynergies(heroStats, state.heroClass, state.inventory);
   const sets = getSetBonuses(state.inventory);
   
   const bossBox = document.getElementById("bossBox");
@@ -269,15 +270,19 @@ function renderSynergyBar(heroStats) {
     bossBox.style.display = state.bossUnlocked ? "block" : "none";
   }
 
+  const allClassSynergies = synergyDefs.filter(syn => !syn.classReq || syn.classReq === state.heroClass);
+
   els.synergyBar.innerHTML = "";
-  if (active.length === 0 && sets.length === 0) {
+  if (allClassSynergies.length === 0 && sets.length === 0) {
     els.synergyBar.innerHTML = '<span class="synergy-chip muted">Нет синергий</span>';
     return;
   }
 
-  active.forEach(s => {
+  allClassSynergies.forEach(s => {
+    const isActive = active.some(a => a.key === s.key);
     const el = document.createElement("span");
-    el.className = "synergy-chip active synergy-item";
+    el.className = `synergy-chip synergy-item ${isActive ? "active" : "inactive"}`;
+    if (!isActive) el.style.opacity = "0.5"; // Dim inactive synergies
     el.textContent = s.name;
     
     const descArray = Object.entries(s.bonus).map(([k, v]) => {
@@ -286,10 +291,18 @@ function renderSynergyBar(heroStats) {
       return `${valStr} ${statLabels[k] || k}`;
     });
     
-    let fullDesc = descArray.join(", ");
-    if (s.conditionStr) fullDesc = `${s.conditionStr} ➔ ${fullDesc}`;
+    let cond = s.conditionStr;
+    if (!cond && s.needs) {
+      cond = "Нужно: " + Object.entries(s.needs).map(([k,v]) => {
+        const isPercent = percentStats.has(k);
+        return `${isPercent ? Math.round(v * 100) + '%' : v} ${statLabels[k] || k}`;
+      }).join(", ");
+    }
     
-    el.dataset.title = s.name;
+    let fullDesc = descArray.join(", ");
+    if (cond) fullDesc = `${cond} ➔ ${fullDesc}`;
+    
+    el.dataset.title = s.name + (isActive ? " (Активна)" : " (Неактивна)");
     el.dataset.desc = fullDesc;
     els.synergyBar.appendChild(el);
   });
