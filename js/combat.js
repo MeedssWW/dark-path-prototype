@@ -113,11 +113,11 @@ export function spawnEnemy(s = state, elite = false, bossSide = null) {
         visual: "beast",
         traits: [],
         hp: Math.round(
-          (82 + sectorCap * 12) * scaling * packPenalty * (elite ? 1.65 : 1)
+          (s.sector <= 20 ? 45 + sectorCap * 7 : 82 + sectorCap * 12) * scaling * packPenalty * (elite ? 1.65 : 1)
         ),
         maxHp: 0,
         damage: Math.round(
-          (11 + sectorCap * 1.6) * (count > 1 ? 0.78 : 1) * (elite ? 1.48 : 1)
+          (s.sector <= 20 ? 6 + sectorCap * 1.2 : 11 + sectorCap * 1.6) * (count > 1 ? 0.78 : 1) * (elite ? 1.48 : 1)
         ),
         armor: Math.round((3 + sectorCap * 0.22) * (elite ? 1.24 : 1)),
         evasion: s.sector <= 20 ? clamp(0.01 + sectorCap * 0.001, 0.01, 0.05) : clamp(0.04 + sectorCap * 0.0012 + (elite ? 0.04 : 0), 0.03, 0.24),
@@ -206,13 +206,14 @@ export function maybeNextEncounter() {
 
   // --- STORY DIALOGUE TRIGGERS ---
   if (!state.currentDialogue && !state.pendingDialogue) {
+    if (state.sector === 1 && state.encounter === 1 && !state.stats.metOldMan) {
+      state.stats.metOldMan = true;
+      state.walkDelay = Date.now() + 5000;
+      state.pendingDialogue = "old_man";
+      return;
+    }
+    
     if (state.encounter === 0) {
-      if (state.sector === 2 && !state.stats.metOldMan) {
-        state.stats.metOldMan = true;
-        state.walkDelay = Date.now() + 5000;
-        state.pendingDialogue = "old_man";
-        return;
-      }
       if (state.sector === 5 && !state.stats.metRefugee) {
         state.stats.metRefugee = true;
         state.walkDelay = Date.now() + 5000;
