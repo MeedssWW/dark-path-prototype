@@ -803,7 +803,8 @@ export function showItemDetails(slotKey) {
   els.detailLevel.textContent = `УР. ${item.level || 1} • ${item.rarity.name}`;
   els.detailLevel.style.color = item.rarity.color;
   
-  els.detailIcon.innerHTML = `<img src="./assets/equipment/${slotKey}.png" alt="${item.name}" onerror="this.style.display='none'">`;
+  const iconKey = item.visual || item.type?.visual || slotKey;
+  els.detailIcon.innerHTML = `<img src="./assets/equipment/${iconKey}.png" alt="${item.name}" onerror="this.style.display='none'">`;
   els.detailIcon.style.borderColor = `${item.rarity.color}66`;
   els.detailIcon.style.boxShadow = `0 0 10px ${item.rarity.color}33`;
   

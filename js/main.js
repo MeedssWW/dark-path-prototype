@@ -574,7 +574,7 @@ function init() {
       const slotKey = gearCell.dataset.slot;
       import("./render.js").then(({ showItemDetails }) => {
         showItemDetails(slotKey);
-      });
+      }).catch(console.error);
     }
   });
 
