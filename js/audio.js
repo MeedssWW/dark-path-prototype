@@ -78,7 +78,12 @@ export const audio = {
         button?.classList.add("active");
         this.stopAmbient();
         musicOn = true;
-      } catch (e) {}
+      } catch (e) {
+        console.warn("MP3 play failed, falling back to ambient.", e);
+        this.startAmbient();
+        button?.classList.add("active");
+        musicOn = true;
+      }
     } else if (!htmlAudio && !musicOn) {
       this.startAmbient();
       button?.classList.add("active");
@@ -101,8 +106,9 @@ export const audio = {
         button?.classList.remove("active");
         musicOn = false;
         return;
-      } catch {
-        /* fallback to ambient */
+      } catch (e) {
+        console.warn("MP3 toggle failed, falling back to ambient.", e);
+        // If it failed to play, fall through to ambient toggle
       }
     }
     if (musicOn) {
@@ -121,19 +127,19 @@ export const audio = {
     this.stopAmbient();
     musicOsc = ctx.createOscillator();
     const g = ctx.createGain();
-    musicOsc.type = "sine";
+    musicOsc.type = "triangle"; // richer sound than sine
     musicOsc.frequency.value = 55;
-    g.gain.value = 0.04;
+    g.gain.value = 0.08; // twice as loud
     musicOsc.connect(g);
     g.connect(musicGain);
     musicOsc.start();
     let step = 0;
-    const notes = [55, 65, 73, 82, 73, 65];
+    const notes = [55, 65, 73, 82, 73, 65, 55, 49]; // slightly longer progression
     musicInterval = setInterval(() => {
       if (!musicOsc) return;
-      musicOsc.frequency.setTargetAtTime(notes[step % notes.length], ctx.currentTime, 0.2);
+      musicOsc.frequency.setTargetAtTime(notes[step % notes.length], ctx.currentTime, 0.5); // smoother glide
       step += 1;
-    }, 2400);
+    }, 2800);
   },
 
   stopAmbient() {
