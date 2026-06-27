@@ -279,9 +279,18 @@ function renderSynergyBar(heroStats) {
     const el = document.createElement("span");
     el.className = "synergy-chip active synergy-item";
     el.textContent = s.name;
-    const desc = Object.entries(s.bonus).map(([k, v]) => `+${v} ${statLabels[k] || k}`).join(", ");
+    
+    const descArray = Object.entries(s.bonus).map(([k, v]) => {
+      const isPercent = percentStats.has(k);
+      const valStr = isPercent ? `+${Math.round(v * 100)}%` : `+${v}`;
+      return `${valStr} ${statLabels[k] || k}`;
+    });
+    
+    let fullDesc = descArray.join(", ");
+    if (s.conditionStr) fullDesc = `${s.conditionStr} ➔ ${fullDesc}`;
+    
     el.dataset.title = s.name;
-    el.dataset.desc = desc;
+    el.dataset.desc = fullDesc;
     els.synergyBar.appendChild(el);
   });
 
@@ -289,9 +298,15 @@ function renderSynergyBar(heroStats) {
     const el = document.createElement("span");
     el.className = "synergy-chip set synergy-item";
     el.textContent = s.label;
-    const desc = Object.entries(s.bonus).map(([k, v]) => `+${v} ${statLabels[k] || k}`).join(", ");
+
+    const descArray = Object.entries(s.bonus).map(([k, v]) => {
+      const isPercent = percentStats.has(k);
+      const valStr = isPercent ? `+${Math.round(v * 100)}%` : `+${v}`;
+      return `${valStr} ${statLabels[k] || k}`;
+    });
+    
     el.dataset.title = s.label;
-    el.dataset.desc = desc;
+    el.dataset.desc = descArray.join(", ");
     els.synergyBar.appendChild(el);
   });
 }

@@ -159,7 +159,8 @@ export const synergyDefs = [
   {
     key: "old_man_gift",
     name: "Тень Леса",
-    needsItems: ["weapon", "boots"],
+    needsVisuals: ["sword", "iron_boots"],
+    conditionStr: "[Железный Меч] + [Железные Сапоги]",
     bonus: { evasion: 0.1 },
   },
   // --- DARK KNIGHT SYNERGIES ---

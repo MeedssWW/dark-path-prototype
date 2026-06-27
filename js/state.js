@@ -158,6 +158,9 @@ function countRaritySlots(inventory, minKey) {
 export function getActiveSynergies(stats, heroClass, inventory = null) {
   return synergyDefs.filter((syn) => {
     if (syn.classReq && syn.classReq !== heroClass) return false;
+    if (syn.needsVisuals && inventory) {
+      if (!syn.needsVisuals.every(v => Object.values(inventory).some(item => item && item.visual === v))) return false;
+    }
     if (syn.needsItems && inventory) {
       if (!syn.needsItems.every(slot => inventory[slot])) return false;
     }
