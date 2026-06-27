@@ -591,19 +591,12 @@ function init() {
 
   const synergyBar = document.getElementById("synergyBar");
   if (synergyBar) {
-    synergyBar.addEventListener("mousemove", (e) => {
+    synergyBar.addEventListener("click", (e) => {
       const item = e.target.closest(".synergy-item");
-      if (item) {
-        els.synergyTooltip.classList.remove("hidden");
-        els.synergyTooltipTitle.textContent = item.dataset.title;
-        els.synergyTooltipDesc.textContent = item.dataset.desc;
-        els.synergyTooltip.style.left = e.pageX + 10 + "px";
-        els.synergyTooltip.style.top = e.pageY + 10 + "px";
-      }
-    });
-    synergyBar.addEventListener("mouseout", (e) => {
-      if (e.target.closest(".synergy-item")) {
-        els.synergyTooltip.classList.add("hidden");
+      const descEl = document.getElementById("synergyDescription");
+      if (item && descEl) {
+        descEl.style.display = "block";
+        descEl.innerHTML = `<strong>${item.dataset.title}</strong>: ${item.dataset.desc}`;
       }
     });
   }

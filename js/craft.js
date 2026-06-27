@@ -1,5 +1,5 @@
 import { state, saveState, addLog } from "./state.js";
-import { generateItem } from "./loot.js";
+import { generateItem, craftSpecificItem } from "./loot.js";
 import { checkMilestones } from "./milestones.js";
 import { slots } from "./data.js";
 
@@ -7,15 +7,29 @@ window.craftGrid = [null, null, null, null, null, null, null, null, null];
 window.selectedCraftResource = null;
 
 const RECIPES = [
-  { result: "weapon", pattern: [null, "iron", null, null, "iron", null, null, "wood", null] }, // Меч
-  { result: "weapon", pattern: [null, "iron", null, null, "wood", null, null, "wood", null] }, // Кинжал/Меч послабее
-  { result: "chest", pattern: ["iron", null, "iron", "iron", "iron", "iron", "iron", "iron", "iron"] },
-  { result: "helmet", pattern: ["iron", "iron", "iron", "iron", null, "iron", null, null, null] },
-  { result: "shoulder", pattern: ["iron", "iron", "iron", "iron", null, "iron", "iron", null, "iron"] },
-  { result: "boots", pattern: [null, null, null, "iron", null, "iron", "iron", null, "iron"] },
-  { result: "ring", pattern: [null, "resin", null, "iron", null, "iron", null, "iron", null] },
-  { result: "necklace", pattern: [null, "iron", null, null, "resin", null, null, "iron", null] },
-  { result: "talisman", pattern: [null, "soulDust", null, "bone", "reagent", "bone", null, "soulDust", null] }
+  // Common Weapons
+  { id: "iron_sword_common", type: "sword", rarity: "common", pattern: [null, "iron", null, null, "iron", null, null, "wood", null] }, // Железный Меч
+  { id: "iron_axe_common", type: "axe", rarity: "common", pattern: ["iron", "iron", null, "iron", "wood", null, null, "wood", null] }, // Топор
+  { id: "iron_dagger_common", type: "dagger", rarity: "common", pattern: [null, null, null, null, "iron", null, null, "wood", null] }, // Кинжал
+  
+  // Rare Weapons
+  { id: "bone_scythe_rare", type: "scythe", rarity: "rare", pattern: ["bone", "bone", "iron", null, "wood", null, null, "wood", null] }, // Коса
+  { id: "shadow_sword_rare", type: "sword", rarity: "rare", pattern: [null, "soulDust", null, null, "iron", null, null, "wood", null] }, // Теневой Меч
+
+  // Common Armor
+  { id: "plate_chest_common", type: "plate", rarity: "common", pattern: ["iron", null, "iron", "iron", "iron", "iron", "iron", "iron", "iron"] },
+  { id: "iron_helm_common", type: "iron_helm", rarity: "common", pattern: ["iron", "iron", "iron", "iron", null, "iron", null, null, null] },
+  { id: "iron_boots_common", type: "iron_boots", rarity: "common", pattern: [null, null, null, "iron", null, "iron", "iron", null, "iron"] },
+  
+  // Rare Armor
+  { id: "bone_mask_rare", type: "bone_mask", rarity: "rare", pattern: ["bone", "bone", "bone", "bone", null, "bone", null, null, null] },
+  
+  // Accessories (Common)
+  { id: "ring_band_common", type: "band", rarity: "common", pattern: [null, "resin", null, "iron", null, "iron", null, "iron", null] },
+  { id: "necklace_pendant_common", type: "pendant", rarity: "common", pattern: [null, "iron", null, null, "resin", null, null, "iron", null] },
+  
+  // Talisman (Rare)
+  { id: "talisman_orb_rare", type: "orb", rarity: "rare", pattern: [null, "soulDust", null, "bone", "reagent", "bone", null, "soulDust", null] }
 ];
 
 // Map UI keys to actual state.resources keys
@@ -51,18 +65,31 @@ window.showRecipesModal = function() {
     list.innerHTML = "<p style='color:#777; width:100%; text-align:center;'>У вас нет открытых рецептов.</p>";
   } else {
     list.innerHTML = state.unlockedRecipes.map(resKey => {
-      const recipe = RECIPES.find(r => r.result === resKey);
+      const recipe = RECIPES.find(r => r.id === resKey);
       if (!recipe) return '';
-      const name = slots.find(s => s.key === resKey)?.name || resKey;
       
+      let name = recipe.id;
+      if (recipe.id.includes("sword")) name = "Меч";
+      else if (recipe.id.includes("axe")) name = "Топор";
+      else if (recipe.id.includes("dagger")) name = "Кинжал";
+      else if (recipe.id.includes("scythe")) name = "Коса";
+      else if (recipe.id.includes("chest")) name = "Нагрудник";
+      else if (recipe.id.includes("helm")) name = "Шлем";
+      else if (recipe.id.includes("boots")) name = "Сапоги";
+      else if (recipe.id.includes("ring")) name = "Кольцо";
+      else if (recipe.id.includes("necklace")) name = "Амулет";
+      else if (recipe.id.includes("talisman")) name = "Сфера";
+      
+      const rarityColor = recipe.rarity === "common" ? "#ccc" : (recipe.rarity === "rare" ? "#4da6ff" : "#fff");
+
       const gridHtml = recipe.pattern.map(p => {
-        const bg = p ? `url(./assets/items/${p}.png)` : 'none';
+        const bg = p ? `url(./assets/items/${Object.keys(RES_MAP).find(k => RES_MAP[k] === p) || p}.png)` : 'none';
         return `<div style="width:24px; height:24px; border:1px solid #444; background: ${bg} center/contain no-repeat #2a2a2a;"></div>`;
       }).join("");
 
       return `
         <div style="background: rgba(255,255,255,0.05); border: 1px solid #555; border-radius: 8px; padding: 10px; display:flex; flex-direction:column; align-items:center;">
-          <h4 style="margin: 0 0 10px 0; color: #ddd;">${name}</h4>
+          <h4 style="margin: 0 0 10px 0; color: ${rarityColor};">${name} (${recipe.rarity})</h4>
           <div style="display:grid; grid-template-columns: repeat(3, 24px); gap: 2px;">
             ${gridHtml}
           </div>
@@ -132,15 +159,15 @@ function checkRecipe() {
         break;
       }
     }
-    if (match) return recipe.result;
+    if (match) return recipe;
   }
   return null;
 }
 
 window.attemptGridCraft = function() {
-  const resultSlot = checkRecipe();
+  const recipe = checkRecipe();
   
-  if (!resultSlot) {
+  if (!recipe) {
     showCraftMsg("Неизвестный рецепт!", "#e55");
     return;
   }
@@ -148,21 +175,28 @@ window.attemptGridCraft = function() {
   // Clear grid (items are already deducted from inventory when placed)
   window.craftGrid.fill(null);
 
-  // Determine rarity
-  const roll = Math.random();
-  let rarityKey = "common";
-  if (roll > 0.95) rarityKey = "legendary";
-  else if (roll > 0.8) rarityKey = "epic";
-  else if (roll > 0.5) rarityKey = "rare";
-  else if (roll > 0.2) rarityKey = "uncommon";
-
   const itemLevel = state.sector * 10;
-  const item = generateItem(resultSlot, itemLevel, rarityKey);
+  const item = craftSpecificItem(recipe.type, recipe.rarity, itemLevel);
   
+  if (!item) {
+    showCraftMsg("Ошибка крафта: Предмет не найден", "#e55");
+    return;
+  }
+
   // Add directly to inventory
-  const old = state.inventory[item.slot];
-  if (old) state.gold += Math.floor(old.value * 0.45);
-  state.inventory[item.slot] = item;
+  const old = state.inventory[item.slotName]; // wait, slotName is localized. We need slotKey.
+  // Actually craftSpecificItem needs to return slotKey. I will fix that in attemptGridCraft by looking up the slot key.
+  let slotKey = Object.keys(slots).find(k => slots[k]?.name === item.slotName);
+  if (!slotKey) {
+     // fallback search
+     const foundSlot = slots.find(s => s.name === item.slotName);
+     if (foundSlot) slotKey = foundSlot.key;
+  }
+  item.slot = slotKey;
+
+  const oldItem = state.inventory[slotKey];
+  if (oldItem) state.gold += Math.floor(oldItem.value * 0.45 || 10);
+  state.inventory[slotKey] = item;
   
   addLog(state, `Скрафчен предмет: ${item.name}`);
   showCraftMsg(`Успех! Создано: ${item.name}`, item.rarity.color || "#6c4");
@@ -215,9 +249,9 @@ export function renderCraftUI() {
   }).join("");
 
   // Check preview
-  const resultSlot = checkRecipe();
-  if (resultSlot) {
-    previewEl.innerHTML = `<img src="./assets/equipment/${resultSlot}.png" style="width: 48px; height: 48px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));">`;
+  const recipe = checkRecipe();
+  if (recipe) {
+    previewEl.innerHTML = `<img src="./assets/items/${recipe.type}.png" style="width: 48px; height: 48px; filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));" onerror="this.src='./assets/equipment/weapon.png'">`;
   } else {
     previewEl.innerHTML = `<span style="color:#555; font-size:12px;">Пусто</span>`;
   }

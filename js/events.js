@@ -73,7 +73,7 @@ const effectHandlers = {
     s.resources.iron = (s.resources.iron || 0) + 3;
     s.resources.wood = (s.resources.wood || 0) + 3;
     if (!s.unlockedRecipes) s.unlockedRecipes = [];
-    if (!s.unlockedRecipes.includes("weapon")) s.unlockedRecipes.push("weapon");
+    if (!s.unlockedRecipes.includes("iron_sword_common")) s.unlockedRecipes.push("iron_sword_common");
     addLog(s, "Старик передал вам Железо (3), Дерево (3) и Рецепт Меча.");
     if (!s.journalEntries) s.journalEntries = [];
     s.journalEntries.push({ title: "Пепел и Железо", text: "Странный изувеченный старик у костра. Он видел, как вырезали мой отряд, но даже не пошевелился. Он прав: мертвецам не нужны герои. Он дал мне немного обломков и чертеж меча. Вещи «помнят друг друга», сказал он. Если соединить правильные предметы, они вступят в Синергию. Похоже, это мой единственный шанс выжить.", time: Date.now() });

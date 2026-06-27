@@ -123,7 +123,12 @@ export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) 
   const reagent = Math.random() > 0.75 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
   const wood = Math.random() > 0.5 ? Math.floor(Math.random() * 3) + (forceBoss ? 3 : 1) : 0;
   
-  const recipeDrops = ["weapon", "helmet", "chest", "boots", "necklace", "ring", "shoulder", "talisman"];
+  const recipeDrops = [
+    "iron_sword_common", "iron_axe_common", "iron_dagger_common", 
+    "plate_chest_common", "iron_helm_common", "iron_boots_common", 
+    "ring_band_common", "necklace_pendant_common",
+    "bone_scythe_rare", "shadow_sword_rare", "bone_mask_rare", "talisman_orb_rare"
+  ];
   let recipe = null;
   // 15% chance to drop a recipe, only if it's not already unlocked
   if (Math.random() < 0.15) {
@@ -140,6 +145,44 @@ export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) 
   };
 }
 
+export function craftSpecificItem(itemKey, rarityKey, level) {
+  let foundType = null;
+  let slotName = "Предмет";
+  for (const [slot, types] of Object.entries(itemTypes)) {
+    const match = types.find(t => t.key === itemKey);
+    if (match) {
+      foundType = match;
+      slotName = slots.find(s => s.key === slot)?.name || slot;
+      break;
+    }
+  }
+  
+  if (!foundType) return null;
+  
+  const r = rarities.find(x => x.key === rarityKey) || rarities[0];
+  const major = r.major || (slotName === "Оружие" ? "damage" : "health");
+  
+  const stats = {};
+  stats[major] = statRoll(major, r.power, true) * (1 + level * 0.1);
+  
+  // Add some secondary stats based on rarity
+  const possibleSec = ["armor", "accuracy", "combo", "crit", "evasion", "lifeSteal", "bleed"].filter(x => x !== major);
+  for (let i = 0; i < r.power; i++) {
+    const sec = possibleSec[Math.floor(Math.random() * possibleSec.length)];
+    stats[sec] = (stats[sec] || 0) + statRoll(sec, r.power, false) * (1 + level * 0.05);
+  }
+
+  return {
+    id: Date.now() + Math.random().toString(36).substr(2, 5),
+    name: `${r.name} ${foundType.name}`,
+    slotName,
+    visual: foundType.visual,
+    rarity: r,
+    level,
+    stats
+  };
+}
+
 export function generateLootHtml(item) {
   if (!item) return "";
   if (item.isResource) {
@@ -151,7 +194,20 @@ export function generateLootHtml(item) {
     if (item.resin) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/resin.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Смола: +${item.resin}</span></div>`;
     if (item.reagent) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/reagent.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Реагент: +${item.reagent}</span></div>`;
     if (item.wood) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/wood.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Древесина: +${item.wood}</span></div>`;
-    if (item.recipe) html += `<div style="display:flex; align-items:center; gap:8px; color: #ffeb3b;"><img src="./assets/items/scroll.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Рецепт: ${slots.find(s => s.key === item.recipe)?.name || item.recipe}</span></div>`;
+    if (item.recipe) {
+      let rName = item.recipe;
+      if (item.recipe.includes("sword")) rName = "Меч";
+      else if (item.recipe.includes("axe")) rName = "Топор";
+      else if (item.recipe.includes("dagger")) rName = "Кинжал";
+      else if (item.recipe.includes("scythe")) rName = "Коса";
+      else if (item.recipe.includes("chest")) rName = "Нагрудник";
+      else if (item.recipe.includes("helm")) rName = "Шлем";
+      else if (item.recipe.includes("boots")) rName = "Сапоги";
+      else if (item.recipe.includes("ring")) rName = "Кольцо";
+      else if (item.recipe.includes("necklace")) rName = "Амулет";
+      else if (item.recipe.includes("talisman")) rName = "Сфера";
+      html += `<div style="display:flex; align-items:center; gap:8px; color: #ffeb3b;"><img src="./assets/items/scroll.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Рецепт: ${rName}</span></div>`;
+    }
     html += `</div>`;
     return html;
   }
