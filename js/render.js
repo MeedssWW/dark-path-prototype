@@ -416,7 +416,7 @@ function renderHands() {
     let rightArmSrc = isKnight ? `./assets/first_person/right_arm.png?v=${v}` : `./assets/first_person/right_arm_${cls}.png?v=${v}`;
 
     if (weapon) {
-      const wKey = weapon.type.key;
+      const wKey = weapon.visual || weapon.type?.key || "sword";
       const suffix = isKnight ? "" : `_${cls}`;
       
       if (['sword', 'dagger', 'axe', 'scythe'].includes(wKey)) {
@@ -434,8 +434,9 @@ function renderHands() {
   }
   if (els.playerOffhandImg) {
     if (offhand) {
+      const oKey = offhand.visual || offhand.type?.key || "shield";
       els.playerOffhandImg.style.display = 'block';
-      els.playerOffhandImg.src = `./assets/first_person/${offhand.type.key}.png?v=${v}`;
+      els.playerOffhandImg.src = `./assets/first_person/${oKey}.png?v=${v}`;
     } else {
       els.playerOffhandImg.style.display = 'none';
     }
