@@ -456,28 +456,53 @@ function renderLoot() {
     els.lootCard.classList.add("loot-drop");
   }
 
+  let resName = item.name;
+  let iconKey = item.visual || item.type?.visual || item.slot || "iron";
+  let resText = "";
+  
+  if (item.isResource) {
+    const drops = [];
+    if (item.iron) drops.push({ key: "iron", name: "Железа", amt: item.iron });
+    if (item.wood) drops.push({ key: "wood", name: "Древесины", amt: item.wood });
+    if (item.soulDust) drops.push({ key: "soul_dust", name: "Пыли душ", amt: item.soulDust });
+    if (item.bone) drops.push({ key: "bone", name: "Кости", amt: item.bone });
+    if (item.resin) drops.push({ key: "resin", name: "Смолы", amt: item.resin });
+    if (item.reagent) drops.push({ key: "reagent", name: "Реагента", amt: item.reagent });
+    if (item.recipe) drops.push({ key: "scroll", name: "Чертеж", amt: 1 });
+    
+    if (drops.length > 0) {
+      const primary = drops[0];
+      if (!item.name) resName = primary.name === "Чертеж" ? "Новый чертеж!" : `Ресурсы`;
+      iconKey = primary.key;
+      resText = drops.map(d => `${d.amt} ${d.name}`).join(", ");
+    } else {
+      resName = "Пусто";
+      iconKey = "iron";
+      resText = "Ничего нет";
+    }
+  }
+
   if (els.lootName) {
-    els.lootName.textContent = item.name;
+    els.lootName.textContent = resName;
     els.lootName.style.color = item.rarity?.color || "#fff";
   }
 
   if (els.lootIcon) {
-    const iconKey = item.visual || item.type?.visual || item.slot || "iron";
     const dir = item.isResource ? "items" : "equipment";
     const iconSrc = `./assets/${dir}/${iconKey}.png`;
     els.lootIcon.className = 'item-icon-img large';
-    els.lootIcon.innerHTML = `<img src="${iconSrc}" alt="${item.name}" onerror="this.style.display='none'">`;
+    els.lootIcon.innerHTML = `<img src="${iconSrc}" alt="${resName}" onerror="this.style.display='none'">`;
     els.lootIcon.style.cssText = `border-color: ${item.rarity?.color || '#fff'}55; box-shadow: 0 0 20px ${item.rarity?.color || '#fff'}33;`;
   }
 
   if (item.isResource) {
     if (els.lootRarityBadge) {
-      els.lootRarityBadge.textContent = "Ресурс";
+      els.lootRarityBadge.textContent = "Находка";
       els.lootRarityBadge.style.borderColor = "#aaa";
       els.lootRarityBadge.style.color = "#aaa";
     }
-    if (els.lootStats) els.lootStats.innerHTML = `<span style="color:var(--gold);">Получено: ${item.iron ? item.iron + " Железа" : item.soulDust + " Пыли душ"}</span>`;
-    if (els.lootCompare) els.lootCompare.innerHTML = `<div class="compare-verdict equal">Полезно для улучшения снаряжения</div>`;
+    if (els.lootStats) els.lootStats.innerHTML = `<span style="color:var(--gold);">Получено: ${resText}</span>`;
+    if (els.lootCompare) els.lootCompare.innerHTML = `<div class="compare-verdict equal">Полезно для крафта</div>`;
     return;
   }
 
