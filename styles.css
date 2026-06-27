@@ -2974,8 +2974,10 @@ body[data-location="abyss"] .ruin-right {
 .bottom-tabs {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 520px; display: flex;
-  background: rgba(12,12,16,0.95); border-top: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px); z-index: 50;
+  background: rgba(15, 15, 20, 0.65);
+  border-top: 1px solid rgba(255, 215, 100, 0.15);
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.7), inset 0 1px 5px rgba(255, 215, 100, 0.05);
+  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 50;
   padding: 4px 0; padding-bottom: max(4px, env(safe-area-inset-bottom));
 }
 .tab-btn {
@@ -3183,8 +3185,10 @@ body[data-location="abyss"] .ruin-right {
 .bottom-tabs {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 520px; display: flex;
-  background: rgba(12,12,16,0.95); border-top: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px); z-index: 50;
+  background: rgba(15, 15, 20, 0.65);
+  border-top: 1px solid rgba(255, 215, 100, 0.15);
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.7), inset 0 1px 5px rgba(255, 215, 100, 0.05);
+  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 50;
   padding: 4px 0; padding-bottom: max(4px, env(safe-area-inset-bottom));
 }
 .tab-btn {
