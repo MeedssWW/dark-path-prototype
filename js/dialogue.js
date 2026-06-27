@@ -1,6 +1,7 @@
 import { dialogueData } from "./dialogueData.js";
 import { state, updateEpicStat } from "./state.js";
 import { render } from "./render.js";
+import { spawnDialogueEnemy } from "./combat.js";
 
 export function startDialogue(npcKey) {
   const data = dialogueData[npcKey];
@@ -156,20 +157,32 @@ function endDialogue(triggerCombat = false) {
     eyelidBottom.style.height = "50%";
     
     setTimeout(() => {
-      state.currentDialogue = null;
       if (dialogueSection) dialogueSection.classList.add("hidden");
       if (equipSection) equipSection.classList.remove("hidden");
       if (dialogueSceneBg) dialogueSceneBg.style.display = "none";
-      
-      const vid = document.getElementById("locationVideo");
-      if (vid && vid.paused && !state.currentEnemy) vid.play();
       
       eyelidTop.style.height = "0%";
       eyelidBottom.style.height = "0%";
       
       if (triggerCombat) {
-        // Trigger specific combat
+        let displayName = "Незнакомец";
+        if (state.currentDialogue?.npc === "old_man") displayName = "Старик";
+        else if (state.currentDialogue?.npc === "elara") displayName = "Элара";
+        else if (state.currentDialogue?.npc === "garrick") displayName = "Гаррик";
+        else if (state.currentDialogue?.npc === "looter") displayName = "Мародёр";
+        
+        const npcKey = state.currentDialogue?.npc || "beast";
+        state.currentDialogue = null;
+        spawnDialogueEnemy(npcKey, displayName);
+        
+        const vid = document.getElementById("locationVideo");
+        if (vid && vid.paused && !state.currentEnemy) vid.play();
+        
+        render();
       } else {
+        state.currentDialogue = null;
+        const vid = document.getElementById("locationVideo");
+        if (vid && vid.paused && !state.currentEnemy) vid.play();
         render();
       }
     }, 600);

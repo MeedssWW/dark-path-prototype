@@ -146,6 +146,41 @@ export function spawnEnemy(s = state, elite = false, bossSide = null) {
   return s;
 }
 
+export function spawnDialogueEnemy(npcKey, displayName) {
+  const s = state;
+  const sectorCap = Math.min(s.sector, 50);
+  const scaling = 1 + sectorCap * 0.08;
+  
+  // Custom stats for NPCs (they are elite-like)
+  const enemy = {
+    id: crypto.randomUUID(),
+    name: displayName,
+    bossSide: null,
+    elite: true,
+    visual: npcKey, // uses the same key as dialogue for image mapping
+    traits: ["Персонаж"],
+    hp: Math.round((120 + sectorCap * 15) * scaling),
+    maxHp: 0,
+    damage: Math.round((15 + sectorCap * 2) * 1.5),
+    armor: Math.round(5 + sectorCap * 0.3),
+    evasion: clamp(0.08 + sectorCap * 0.0015, 0.05, 0.3),
+    accuracy: clamp(0.85 + sectorCap * 0.002, 0.7, 0.98),
+    bleedStacks: [],
+    bleedOnHit: 0,
+    healOnHit: 0,
+  };
+  enemy.maxHp = enemy.hp;
+  
+  s.enemyGroup = [enemy];
+  s.currentEnemy = enemy;
+  s.awaitingEvent = false;
+  s.currentEvent = null;
+  audio.playBoss(); // Dialogue combats are boss-like
+  addLog(s, `${enemy.name} нападает!`);
+  
+  return s;
+}
+
 export function maybeNextEncounter() {
   if (state.currentEnemy || getAliveEnemies().length || state.awaitingEvent || state.pendingLoot || state.currentDialogue || state.pendingDialogue) return;
 

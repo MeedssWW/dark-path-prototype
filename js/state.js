@@ -229,6 +229,12 @@ export function getHeroStats(s = state) {
     });
   });
 
+  if (s.psyche) {
+    if (s.psyche.loyalty > 0) base.armor += s.psyche.loyalty * 0.15; // 1 лояльность = 0.15 брони
+    if (s.psyche.humanity > 0) base.lifeSteal += s.psyche.humanity * 0.002; // 1 человечность = 0.2% вампиризма
+    if (s.psyche.doubt > 0) base.crit += s.psyche.doubt * 0.005; // 1 сомнение = 0.5% крита
+  }
+
   base.combo = clamp(base.combo, 0, 0.72);
   base.crit = clamp(base.crit, 0, 0.72);
   base.evasion = clamp(base.evasion, 0, 0.55);

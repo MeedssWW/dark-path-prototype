@@ -24,6 +24,7 @@ import { bindElements, render, els, setCombatStatus, setSpeedMultiplier, trigger
 import { getSpeedMultiplier } from "./fx.js";
 import { getAliveEnemies } from "./state.js";
 import { checkMilestones } from "./milestones.js";
+import { renderCraftUI } from "./craft.js";
 
 let tickTimer = null;
 let combatAnimating = false;
@@ -435,55 +436,12 @@ function setupLootSwipes() {
   }
 }
 
-window.craftEquipment = function(type) {
-  if (!state.resources) state.resources = { iron: 0, soulDust: 0 };
-  let costIron = 0;
-  let costDust = 0;
-  
-  if (type === "weapon") { costIron = 10; costDust = 2; }
-  else if (type === "armor") { costIron = 12; costDust = 1; }
-  else if (type === "accessory") { costIron = 5; costDust = 5; }
-  
-  const resultEl = document.getElementById("craftingResult");
-  
-  if (state.resources.iron >= costIron && state.resources.soulDust >= costDust) {
-    state.resources.iron -= costIron;
-    state.resources.soulDust -= costDust;
-    
-    // Determine rarity based on sector and random chance
-    const roll = Math.random();
-    let rarityKey = "common";
-    if (roll > 0.9) rarityKey = "epic";
-    else if (roll > 0.6) rarityKey = "rare";
-    
-    const itemLevel = state.sector * 10;
-    const item = generateItem(type, itemLevel, rarityKey);
-    
-    // Add directly to inventory
-    const old = state.inventory[item.slot];
-    if (old) state.gold += Math.floor(old.value * 0.45);
-    state.inventory[item.slot] = item;
-    
-    addLog(state, `Скрафчен предмет: ${item.name}`);
-    if (resultEl) resultEl.textContent = `Успех! Скрафчен: ${item.name}`;
-    
-    saveState();
-    checkMilestones(state);
-    import("./render.js").then(({ render }) => render());
-  } else {
-    if (resultEl) {
-      resultEl.textContent = "Не хватает ресурсов!";
-      resultEl.style.color = "#e55";
-      setTimeout(() => { resultEl.style.color = "#6c4"; resultEl.textContent = ""; }, 2000);
-    }
-  }
-};
-
 function init() {
   bindElements();
   setupClassOverlay();
   setupTutorial();
   updateEpicStat();
+  renderCraftUI(); // Initialize new craft UI
   render();
   checkMilestones(state);
   setupLootSwipes();
@@ -578,6 +536,7 @@ function init() {
       tabPanels.forEach((panel) => {
         if (panel.dataset.tab === tabName) {
           panel.classList.remove("hidden");
+          if (tabName === "craft") renderCraftUI();
         } else {
           panel.classList.add("hidden");
         }

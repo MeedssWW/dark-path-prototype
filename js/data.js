@@ -662,6 +662,7 @@ export const storyEvents = [
     kind: "Сюжет (Акт 1)",
     title: "Встреча у костра",
     text: "Старик в изодранном плаще сидит у костра.\n\n«Я вижу, ты из тех, кто собирает Души... Знаешь ли ты, что если собрать пять Душ Рая или Ада, можно открыть Врата? И еще... вещи, выкованные в одной кузне, резонируют друг с другом.»",
+    image: "./assets/npc/old_man.png",
     choices: [
       { label: "Слушать и запомнить", effectKey: "unlock_bosses" }
     ]
@@ -671,6 +672,7 @@ export const storyEvents = [
     kind: "Моральный выбор",
     title: "Раненый солдат",
     text: "Ты находишь дезертира из вражеской армии. Он истекает кровью и умоляет о помощи, проклиная войну, в которую его бросили.",
+    image: "./assets/npc/dying_soldier.png",
     choices: [
       { label: "Перевязать рану (+Человечность)", effectKey: "deserter_help" },
       { label: "Добить врага (+Жестокость, +Золото)", effectKey: "deserter_kill" }
@@ -681,9 +683,22 @@ export const storyEvents = [
     kind: "Моральный выбор",
     title: "Патруль Короны",
     text: "Патруль твоего королевства преграждает путь. Командир смотрит на тебя с подозрением: «Кто таков? Предъяви бумаги!»",
+    image: "./assets/npc/crown_patrol.png",
     choices: [
       { label: "Солгать и спрятаться (+Сомнение)", effectKey: "patrol_lie" },
       { label: "Показать Приказ и Письмо (+Лояльность)", effectKey: "patrol_truth" }
+    ]
+  },
+  {
+    key: "fugitive_alchemist",
+    kind: "Случайная встреча",
+    title: "Беглый Алхимик",
+    text: "Из кустов появляется человек в рваном капюшоне. Его лицо покрыто ожогами, а в руках он судорожно сжимает светящиеся колбы. «Тебе нужна сила? У меня есть то, что они хотели скрыть... за небольшую плату».",
+    image: "./assets/npc/fugitive_alchemist.png",
+    choices: [
+      { label: "Купить реагент (100 G)", effectKey: "alchemist_buy" },
+      { label: "Отнять силой (-Человечность)", effectKey: "alchemist_rob" },
+      { label: "Пройти мимо", effectKey: "alchemist_ignore" }
     ]
   }
 ];

@@ -7,6 +7,20 @@ import { audio } from "./audio.js";
 export function startEvent() {
   let event = null;
 
+  // Story event triggers
+  if (!state.storyFlags) state.storyFlags = {};
+  if (!state.psyche) state.psyche = { loyalty: 0, doubt: 0, humanity: 0 };
+  
+  if (!state.storyFlags.intro_knight && state.sector >= 2) {
+    event = storyEvents.find(e => e.key === "lore_intro_knight");
+  } else if (!state.storyFlags.met_deserter && state.sector >= 3) {
+    event = storyEvents.find(e => e.key === "moral_deserter");
+  } else if (!state.storyFlags.met_patrol && state.sector >= 5) {
+    event = storyEvents.find(e => e.key === "moral_patrol");
+  } else if (!state.storyFlags.met_alchemist && state.sector >= 6) {
+    event = storyEvents.find(e => e.key === "fugitive_alchemist");
+  }
+
   // Fallback to random event
   if (!event) {
     event = events[Math.floor(Math.random() * events.length)];
@@ -254,6 +268,29 @@ const effectHandlers = {
       text: "Я показал патрулю Приказ. Они козырнули и указали мне прямую, но опасную дорогу. Мой долг перед Короной священен."
     });
     addLog(s, "Лояльность растет. Следующий враг может быть элитным.");
+  },
+  alchemist_buy: (s) => {
+    s.storyFlags.met_alchemist = true;
+    if (s.gold >= 100) {
+      s.gold -= 100;
+      s.resources = s.resources || { iron: 0, soulDust: 0, reagent: 0 };
+      s.resources.reagent = (s.resources.reagent || 0) + 1;
+      addLog(s, "Вы купили редкий алхимический реагент.");
+    } else {
+      addLog(s, "Не хватает золота. Алхимик скрылся.");
+    }
+  },
+  alchemist_rob: (s) => {
+    s.storyFlags.met_alchemist = true;
+    s.psyche.humanity -= 15;
+    s.resources = s.resources || { iron: 0, soulDust: 0, reagent: 0 };
+    s.resources.reagent = (s.resources.reagent || 0) + 1;
+    addLog(s, "Вы забрали реагент силой. Человечность падает.");
+    spawnEnemy(s, true); // The alchemist fights back or a monster attacks
+  },
+  alchemist_ignore: (s) => {
+    s.storyFlags.met_alchemist = true;
+    addLog(s, "Вы прошли мимо алхимика.");
   }
 };
 

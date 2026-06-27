@@ -118,11 +118,14 @@ export function generateItem(slotKey, itemLevel, rarityKey) {
 export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) {
   const iron = Math.floor(Math.random() * 3) + (forceBoss ? 10 : 1);
   const soulDust = forceBoss ? (Math.floor(Math.random() * 3) + 2) : (Math.random() > 0.7 ? 1 : 0);
+  const bone = Math.random() > 0.6 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
+  const resin = Math.random() > 0.6 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
+  const reagent = Math.random() > 0.75 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
+  const wood = Math.random() > 0.5 ? Math.floor(Math.random() * 3) + (forceBoss ? 3 : 1) : 0;
   
   return {
     isResource: true,
-    iron,
-    soulDust
+    iron, soulDust, bone, resin, reagent, wood
   };
 }
 
@@ -133,6 +136,10 @@ export function generateLootHtml(item) {
     html += `<h4>Ресурсы найдены:</h4>`;
     if (item.iron) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/iron.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;"><span>Обломки железа: +${item.iron}</span></div>`;
     if (item.soulDust) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/soul_dust.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;"><span>Пыль душ: +${item.soulDust}</span></div>`;
+    if (item.bone) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/bone.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Кость: +${item.bone}</span></div>`;
+    if (item.resin) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/resin.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Смола: +${item.resin}</span></div>`;
+    if (item.reagent) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/reagent.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Реагент: +${item.reagent}</span></div>`;
+    if (item.wood) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/wood.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Древесина: +${item.wood}</span></div>`;
     html += `</div>`;
     return html;
   }
@@ -194,10 +201,14 @@ export function equipPendingLoot() {
   if (!state.pendingLoot) return;
   
   if (state.pendingLoot.isResource) {
-    if (!state.resources) state.resources = { iron: 0, soulDust: 0 };
+    if (!state.resources) state.resources = { iron: 0, soulDust: 0, bone: 0, resin: 0, reagent: 0, wood: 0 };
     if (state.pendingLoot.iron) state.resources.iron = (state.resources.iron || 0) + state.pendingLoot.iron;
     if (state.pendingLoot.soulDust) state.resources.soulDust = (state.resources.soulDust || 0) + state.pendingLoot.soulDust;
-    addLog(state, `Ресурсы собраны: Железо (${state.pendingLoot.iron}), Пыль (${state.pendingLoot.soulDust || 0}).`);
+    if (state.pendingLoot.bone) state.resources.bone = (state.resources.bone || 0) + state.pendingLoot.bone;
+    if (state.pendingLoot.resin) state.resources.resin = (state.resources.resin || 0) + state.pendingLoot.resin;
+    if (state.pendingLoot.reagent) state.resources.reagent = (state.resources.reagent || 0) + state.pendingLoot.reagent;
+    if (state.pendingLoot.wood) state.resources.wood = (state.resources.wood || 0) + state.pendingLoot.wood;
+    addLog(state, `Ресурсы собраны!`);
   } else {
     const old = state.inventory[state.pendingLoot.slot];
     if (old) state.gold += Math.floor(old.value * 0.45);
