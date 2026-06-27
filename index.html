@@ -173,7 +173,7 @@
 
         <!-- Souls/Boss panel -->
         <div class="tab-panel hidden" data-tab="souls">
-          <div class="boss-box">
+          <div class="boss-box" id="bossBox" style="display: none;">
             <div class="souls">
               <div><span>Рай (+HP, точность)</span><strong id="heavenSouls">0 / 5</strong></div>
               <div><span>Ад (+урон, кровь)</span><strong id="hellSouls">0 / 5</strong></div>
@@ -210,7 +210,6 @@
           <div class="tab-panel hidden" data-tab="craft" style="padding: 16px;">
             <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--line-strong); border-radius: 8px; padding: 16px; text-align: center; margin-bottom: 20px;">
               <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px;">Ваши Ресурсы (выберите для крафта)</h3>
-              <div id="resourceCounters" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
               <div id="resourceCounters" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
                 <!-- Dynamically populated from JS -->
               </div>

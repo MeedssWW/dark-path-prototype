@@ -264,9 +264,9 @@ function renderSynergyBar(heroStats) {
   const active = getActiveSynergies(heroStats, state.heroClass);
   const sets = getSetBonuses(state.inventory);
   
-  if (!state.bossUnlocked) {
-    els.synergyBar.innerHTML = '<span class="synergy-chip muted">Секретно</span>';
-    return;
+  const bossBox = document.getElementById("bossBox");
+  if (bossBox) {
+    bossBox.style.display = state.bossUnlocked ? "block" : "none";
   }
 
   els.synergyBar.innerHTML = "";
