@@ -411,6 +411,10 @@ body[data-location="abyss"] .stage-sky {
   animation: camera-bob 2.8s ease-in-out infinite;
 }
 
+.road-scene.paused {
+  animation-play-state: paused;
+}
+
 .road-scene-bg {
   position: absolute;
   inset: 0;

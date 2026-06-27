@@ -14,6 +14,9 @@ export function startDialogue(npcKey) {
     data: data
   };
 
+  const roadScene = document.getElementById("roadScene");
+  if (roadScene) roadScene.classList.add("paused");
+
   // Trigger blink transition
   const eyelidTop = document.getElementById("eyelidTop");
   const eyelidBottom = document.getElementById("eyelidBottom");
@@ -156,6 +159,7 @@ function endDialogue(triggerCombat = false) {
   const eyelidTop = document.getElementById("eyelidTop");
   const eyelidBottom = document.getElementById("eyelidBottom");
   const dialogueSceneBg = document.getElementById("dialogueSceneBg");
+  const roadScene = document.getElementById("roadScene");
   
   if (eyelidTop && eyelidBottom) {
     eyelidTop.style.height = "50%";
@@ -168,6 +172,8 @@ function endDialogue(triggerCombat = false) {
       
       eyelidTop.style.height = "0%";
       eyelidBottom.style.height = "0%";
+      
+      if (roadScene) roadScene.classList.remove("paused");
       
       if (triggerCombat) {
         let displayName = "Незнакомец";
@@ -196,6 +202,7 @@ function endDialogue(triggerCombat = false) {
     if (dialogueSection) dialogueSection.classList.add("hidden");
     if (equipSection) equipSection.classList.remove("hidden");
     if (dialogueSceneBg) dialogueSceneBg.style.display = "none";
+    if (roadScene) roadScene.classList.remove("paused");
     render();
   }
 }
