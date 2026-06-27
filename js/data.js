@@ -28,7 +28,7 @@ export const heroClasses = [
     key: "dark_knight",
     name: "Тёмный рыцарь",
     desc: "Броня и выживаемость. Ультимейт: Удар Щитом (урон от Брони и бафф защиты).",
-    base: { health: 180, damage: 12, armor: 10, combo: 0.05, crit: 0.05, evasion: 0.02, accuracy: 0.80, lifeSteal: 0.01, bleed: 0.02 },
+    base: { health: 180, damage: 12, armor: 10, combo: 0, crit: 0, evasion: 0, accuracy: 0.80, lifeSteal: 0, bleed: 0 },
     scaling: { health: 18, damage: 1.5, armor: 1.2 },
     starHitsRequired: 5,
   },
@@ -36,7 +36,7 @@ export const heroClasses = [
     key: "hunter",
     name: "Слепой Охотник",
     desc: "Крит и кровотечение. Ультимейт: Кровавое Безумие (навешивает много кровотечения и лечит).",
-    base: { health: 100, damage: 16, armor: 4, combo: 0.15, crit: 0.15, evasion: 0.10, accuracy: 0.95, lifeSteal: 0.03, bleed: 0.15 },
+    base: { health: 100, damage: 16, armor: 4, combo: 0, crit: 0, evasion: 0, accuracy: 0.95, lifeSteal: 0, bleed: 0 },
     scaling: { health: 10, damage: 3.0, armor: 0.4 },
     starHitsRequired: 5,
   },
@@ -44,7 +44,7 @@ export const heroClasses = [
     key: "cultist",
     name: "Культист Безмолвия",
     desc: "Комбо и мистика. Ультимейт: Темная Жертва (тратит часть ХП для огромного чистого урона).",
-    base: { health: 80, damage: 14, armor: 2, combo: 0.25, crit: 0.08, evasion: 0.05, accuracy: 0.85, lifeSteal: 0.05, bleed: 0.05 },
+    base: { health: 80, damage: 14, armor: 2, combo: 0, crit: 0, evasion: 0, accuracy: 0.85, lifeSteal: 0, bleed: 0 },
     scaling: { health: 8, damage: 2.5, armor: 0.2 },
     starHitsRequired: 4,
   },
@@ -155,6 +155,13 @@ export const statLabels = {
 export const percentStats = new Set(["combo", "crit", "evasion", "accuracy", "lifeSteal", "bleed"]);
 
 export const synergyDefs = [
+  // --- GENERAL SYNERGIES ---
+  {
+    key: "old_man_gift",
+    name: "Тень Леса",
+    needsItems: ["weapon", "boots"],
+    bonus: { evasion: 0.1 },
+  },
   // --- DARK KNIGHT SYNERGIES ---
   {
     key: "shield_wall",

@@ -155,13 +155,19 @@ function countRaritySlots(inventory, minKey) {
   return Object.values(inventory).filter((item) => order.indexOf(item.rarity.key) >= minIdx).length;
 }
 
-export function getActiveSynergies(stats, heroClass) {
+export function getActiveSynergies(stats, heroClass, inventory = null) {
   return synergyDefs.filter((syn) => {
     if (syn.classReq && syn.classReq !== heroClass) return false;
-    return Object.entries(syn.needs).every(([key, need]) => {
-      const val = stats[key] || 0;
-      return val >= need;
-    });
+    if (syn.needsItems && inventory) {
+      if (!syn.needsItems.every(slot => inventory[slot])) return false;
+    }
+    if (syn.needs) {
+      return Object.entries(syn.needs).every(([key, need]) => {
+        const val = stats[key] || 0;
+        return val >= need;
+      });
+    }
+    return true;
   });
 }
 
@@ -217,7 +223,7 @@ export function getHeroStats(s = state) {
   });
 
   const preClamp = { ...base };
-  getActiveSynergies(preClamp, s.heroClass).forEach((syn) => {
+  getActiveSynergies(preClamp, s.heroClass, s.inventory).forEach((syn) => {
     Object.entries(syn.bonus).forEach(([key, value]) => {
       base[key] = (base[key] || 0) + value;
     });

@@ -2,6 +2,7 @@ import { dialogueData } from "./dialogueData.js";
 import { state, updateEpicStat } from "./state.js";
 import { render } from "./render.js";
 import { spawnDialogueEnemy } from "./combat.js";
+import { startEvent, triggerEffect } from "./events.js";
 
 export function startDialogue(npcKey) {
   const data = dialogueData[npcKey];
@@ -131,6 +132,10 @@ function selectChoice(opt) {
   if (opt.cost) {
     const [type, amount] = opt.cost.split("_");
     if (type === "gold") state.gold = Math.max(0, state.gold - parseInt(amount));
+  }
+  
+  if (opt.effect) {
+    triggerEffect(opt.effect);
   }
   
   if (opt.next === "EXIT") {

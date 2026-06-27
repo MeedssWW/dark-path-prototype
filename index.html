@@ -211,8 +211,10 @@
             <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--line-strong); border-radius: 8px; padding: 16px; text-align: center; margin-bottom: 20px;">
               <h3 style="margin: 0 0 12px 0; font-size: 16px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px;">Ваши Ресурсы (выберите для крафта)</h3>
               <div id="resourceCounters" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
+              <div id="resourceCounters" style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
                 <!-- Dynamically populated from JS -->
               </div>
+              <button class="primary-button" style="margin-top: 15px; font-size: 14px; padding: 8px 16px;" onclick="window.showRecipesModal()">Мои Рецепты</button>
             </div>
 
             <div id="craftingGridUI" style="display: flex; justify-content: center; align-items: center; gap: 30px; margin-top: 20px;">
@@ -364,9 +366,20 @@
       <p class="milestone-text"></p>
     </div>
 
-    <audio id="musicPlayer" loop preload="none">
-      <source src="./assets/hide-cs01-slowed.mp3" type="audio/mpeg" />
-    </audio>
-    <script type="module" src="./js/main.js?v=31"></script>
+    <audio id="clickSound" src="./assets/sfx/click.mp3" preload="auto"></audio>
+    <audio id="bgmForest" src="./assets/sfx/bgm_forest.mp3" preload="auto" loop></audio>
+
+    <!-- Recipes Modal -->
+    <div id="recipesModal" class="hidden-popup" style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
+      <div style="background:#1a1a1a; border: 2px solid #5a1c1c; border-radius: 12px; width: 90%; max-width: 600px; padding: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.9); max-height: 80vh; overflow-y: auto;">
+        <h2 style="color:#f0d68a; margin-top:0; border-bottom:1px solid #444; padding-bottom:10px; display:flex; justify-content:space-between;">Открытые Рецепты <button onclick="document.getElementById('recipesModal').classList.add('hidden-popup')" style="background:none; border:none; color:#f0d68a; font-size:24px; cursor:pointer;">&times;</button></h2>
+        <div id="recipesList" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:center; margin-top: 15px;">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="./js/main.js"></script>
   </body>
 </html>

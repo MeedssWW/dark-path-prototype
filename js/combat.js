@@ -120,7 +120,7 @@ export function spawnEnemy(s = state, elite = false, bossSide = null) {
           (11 + sectorCap * 1.6) * (count > 1 ? 0.78 : 1) * (elite ? 1.48 : 1)
         ),
         armor: Math.round((3 + sectorCap * 0.22) * (elite ? 1.24 : 1)),
-        evasion: clamp(0.04 + sectorCap * 0.0012 + (elite ? 0.04 : 0), 0.03, 0.24),
+        evasion: s.sector <= 20 ? clamp(0.01 + sectorCap * 0.001, 0.01, 0.05) : clamp(0.04 + sectorCap * 0.0012 + (elite ? 0.04 : 0), 0.03, 0.24),
         accuracy: clamp(0.82 + Math.min(0.14, sectorCap * 0.001) + (elite ? 0.04 : 0), 0.65, 0.97),
         bleedStacks: [],
         bleedOnHit: 0,
@@ -206,17 +206,17 @@ export function maybeNextEncounter() {
 
   // --- STORY DIALOGUE TRIGGERS ---
   if (!state.currentDialogue && !state.pendingDialogue) {
-    if (state.sector === 1 && state.encounter === 1 && !state.stats.metOldMan) {
-      state.stats.metOldMan = true;
-      state.walkDelay = Date.now() + 5000;
-      state.pendingDialogue = "old_man";
-      return;
-    }
     if (state.encounter === 0) {
-      if (state.sector === 4 && !state.stats.metElara) {
-        state.stats.metElara = true;
+      if (state.sector === 2 && !state.stats.metOldMan) {
+        state.stats.metOldMan = true;
         state.walkDelay = Date.now() + 5000;
-        state.pendingDialogue = "elara";
+        state.pendingDialogue = "old_man";
+        return;
+      }
+      if (state.sector === 5 && !state.stats.metRefugee) {
+        state.stats.metRefugee = true;
+        state.walkDelay = Date.now() + 5000;
+        state.pendingDialogue = "refugee";
         return;
       }
       if (state.sector === 8 && !state.stats.metGarrick) {
@@ -225,19 +225,35 @@ export function maybeNextEncounter() {
         state.pendingDialogue = "garrick";
         return;
       }
-      if (state.sector === 10 && !state.stats.metSideNPC) {
-        state.stats.metSideNPC = true;
+      if (state.sector === 11 && !state.stats.metAltar) {
+        state.stats.metAltar = true;
         state.walkDelay = Date.now() + 5000;
-        const roll = Math.random();
-        if (roll < 0.33) state.pendingDialogue = "dying_soldier";
-        else if (roll < 0.66) state.pendingDialogue = "blind_witch";
-        else state.pendingDialogue = "looter";
+        state.pendingDialogue = "corrupted_altar";
+        return;
+      }
+      if (state.sector === 14 && !state.stats.metElara) {
+        state.stats.metElara = true;
+        state.walkDelay = Date.now() + 5000;
+        state.pendingDialogue = "elara";
+        return;
+      }
+      if (state.sector === 17 && !state.stats.metAlchemist) {
+        state.stats.metAlchemist = true;
+        state.walkDelay = Date.now() + 5000;
+        state.pendingDialogue = "fugitive_alchemist";
+        return;
+      }
+      if (state.sector === 19 && !state.stats.metMercenary) {
+        state.stats.metMercenary = true;
+        state.walkDelay = Date.now() + 5000;
+        state.pendingDialogue = "wounded_mercenary";
         return;
       }
     }
   }
 
-  const eliteRollBase = state.nextEliteChance > 0 ? state.nextEliteChance : BALANCE.eliteChance + state.sector * BALANCE.eliteChanceGrowth;
+  const baseEliteChance = state.sector <= 20 ? (BALANCE.eliteChance * 0.1) : BALANCE.eliteChance;
+  const eliteRollBase = state.nextEliteChance > 0 ? state.nextEliteChance : baseEliteChance + state.sector * BALANCE.eliteChanceGrowth;
   const eliteRoll = Math.min(BALANCE.eliteChanceMax, eliteRollBase);
   const isElite = Math.random() < eliteRoll;
   if (state.nextEliteChance > 0) state.nextEliteChance = 0;

@@ -32,6 +32,10 @@ export function startEvent() {
   audio.playEvent();
 }
 
+export function triggerEffect(key) {
+  if (effectHandlers[key]) effectHandlers[key](state);
+}
+
 export function finishEvent(s) {
   const spawnedFight = Boolean(s.currentEnemy || (s.enemyGroup && s.enemyGroup.some((e) => e.hp > 0)));
   const countsEncounter = s.currentEvent?.countsEncounter !== false;
@@ -64,6 +68,28 @@ export function sendSoul(s, side) {
 }
 
 const effectHandlers = {
+  old_man_gift: (s) => {
+    if (!s.resources) s.resources = {};
+    s.resources.iron = (s.resources.iron || 0) + 3;
+    s.resources.wood = (s.resources.wood || 0) + 3;
+    if (!s.unlockedRecipes) s.unlockedRecipes = [];
+    if (!s.unlockedRecipes.includes("weapon")) s.unlockedRecipes.push("weapon");
+    addLog(s, "Старик передал вам Железо, Дерево и Рецепт Меча.");
+    if (!s.journalEntries) s.journalEntries = [];
+    s.journalEntries.push({ title: "Мудрец у костра", text: "Я встретил старца. Он научил меня, что вещи могут усиливать друг друга, и дал первый рецепт.", time: Date.now() });
+  },
+  refugee_food: (s) => { s.gold = Math.max(0, s.gold - 15); addLog(s, "Вы отдали припасы."); },
+  refugee_ignore: (s) => { addLog(s, "Вы прошли мимо беженца."); },
+  refugee_kill: (s) => { addLog(s, "Вы убили беженца. Найдено немного золота."); s.gold += 10; },
+  altar_cleanse: (s) => { addLog(s, "Вы очистили алтарь. +Райская душа"); s.heavenSouls = Math.min(5, (s.heavenSouls||0)+1); },
+  altar_use: (s) => { addLog(s, "Темная мощь наполняет вас. +Адская душа, +Урон"); s.hellSouls = Math.min(5, (s.hellSouls||0)+1); s.buffs.damage = (s.buffs.damage||0) + 0.1; },
+  altar_ignore: (s) => { addLog(s, "Вы обошли алтарь."); },
+  merc_kill: (s) => { addLog(s, "Вы добили наемника. +Золото"); s.gold += 30; },
+  merc_heal: (s) => { addLog(s, "Вы вылечили наемника. Он рассказал вам о тайнике. +Ресурс"); if(!s.resources)s.resources={}; s.resources.reagent = (s.resources.reagent||0)+1; },
+  merc_rob: (s) => { addLog(s, "Вы ограбили раненого наемника. +Лут"); s.pendingLoot = import("./loot.js").then(m => m.generateLoot(false, 0.5)).then(l => s.pendingLoot = l); },
+  alchemist_buy: (s) => { s.gold = Math.max(0, s.gold - 50); if(!s.resources)s.resources={}; s.resources.reagent = (s.resources.reagent||0)+3; addLog(s, "Вы купили реагенты."); },
+  alchemist_rob: (s) => { import("./loot.js").then(m => s.pendingLoot = m.generateLoot(false, 0.8)); addLog(s, "Вы ограбили алхимика."); },
+  alchemist_ignore: (s) => { addLog(s, "Вы проигнорировали алхимика."); },
   altar_damage: (s) => addBuff(s, "damage", 0.15, "Алтарь усилил клинок."),
   altar_armor: (s) => addBuff(s, "armor", 0.12, "Кожа героя покрылась рунами."),
   altar_crit: (s) => addBuff(s, "crit", 0.08, "Взгляд героя стал холоднее."),

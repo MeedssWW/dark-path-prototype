@@ -1,6 +1,7 @@
 import { state, saveState, addLog } from "./state.js";
 import { generateItem } from "./loot.js";
 import { checkMilestones } from "./milestones.js";
+import { slots } from "./data.js";
 
 window.craftGrid = [null, null, null, null, null, null, null, null, null];
 window.selectedCraftResource = null;
@@ -39,6 +40,38 @@ const RES_NAMES = {
 window.selectCraftResource = function(resKey) {
   window.selectedCraftResource = resKey;
   renderCraftUI();
+};
+
+window.showRecipesModal = function() {
+  const modal = document.getElementById("recipesModal");
+  const list = document.getElementById("recipesList");
+  if (!modal || !list) return;
+
+  if (!state.unlockedRecipes || state.unlockedRecipes.length === 0) {
+    list.innerHTML = "<p style='color:#777; width:100%; text-align:center;'>У вас нет открытых рецептов.</p>";
+  } else {
+    list.innerHTML = state.unlockedRecipes.map(resKey => {
+      const recipe = RECIPES.find(r => r.result === resKey);
+      if (!recipe) return '';
+      const name = slots.find(s => s.key === resKey)?.name || resKey;
+      
+      const gridHtml = recipe.pattern.map(p => {
+        const bg = p ? `url(./assets/items/${p}.png)` : 'none';
+        return `<div style="width:24px; height:24px; border:1px solid #444; background: ${bg} center/contain no-repeat #2a2a2a;"></div>`;
+      }).join("");
+
+      return `
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid #555; border-radius: 8px; padding: 10px; display:flex; flex-direction:column; align-items:center;">
+          <h4 style="margin: 0 0 10px 0; color: #ddd;">${name}</h4>
+          <div style="display:grid; grid-template-columns: repeat(3, 24px); gap: 2px;">
+            ${gridHtml}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+  
+  modal.classList.remove("hidden-popup");
 };
 
 window.clickCraftSlot = function(index) {

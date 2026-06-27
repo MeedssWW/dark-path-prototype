@@ -166,7 +166,25 @@ small {
   padding: 0 16px;
   background: linear-gradient(180deg, #e8bd63 0%, #9c682a 100%);
   color: #160f09;
-  box-shadow: 0 14px 28px rgba(164, 104, 38, 0.24);
+  border: 1px solid rgba(255, 215, 100, 0.4);
+  box-shadow: 0 4px 15px rgba(164, 104, 38, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #f5d082 0%, #b27a36 100%);
+  box-shadow: 0 6px 20px rgba(164, 104, 38, 0.5), 0 0 12px rgba(255, 215, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.5);
+  border-color: #ffd866;
+  transform: translateY(-2px);
+}
+
+.icon-glow {
+  transition: transform 0.2s, filter 0.2s;
+}
+.icon-glow:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7)) brightness(1.2) !important;
 }
 
 .game-layout {
@@ -2853,10 +2871,12 @@ body[data-location="abyss"] .ruin-right {
   bottom: 0; left: 50%;
   transform: translateX(-50%) translateY(100%);
   width: 100%; max-width: 520px; height: 60vh;
-  background: var(--bg-2);
+  background: rgba(17, 17, 22, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-top-left-radius: 20px; border-top-right-radius: 20px;
-  border: 1px solid var(--line);
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+  border: 1px solid rgba(255, 215, 100, 0.15);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.9), inset 0 2px 10px rgba(255,215,100,0.05);
   padding: 16px 16px 80px 16px;
   z-index: 45;
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -2867,6 +2887,10 @@ body[data-location="abyss"] .ruin-right {
 }
 
 .hidden {
+  display: none !important;
+}
+
+.hidden-popup {
   display: none !important;
 }
 

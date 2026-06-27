@@ -123,9 +123,20 @@ export function generateLoot(forceBoss = false, bonusLuck = 0, lootBias = null) 
   const reagent = Math.random() > 0.75 ? Math.floor(Math.random() * 2) + (forceBoss ? 2 : 1) : 0;
   const wood = Math.random() > 0.5 ? Math.floor(Math.random() * 3) + (forceBoss ? 3 : 1) : 0;
   
+  const recipeDrops = ["weapon", "helmet", "chest", "boots", "necklace", "ring", "shoulder", "talisman"];
+  let recipe = null;
+  // 15% chance to drop a recipe, only if it's not already unlocked
+  if (Math.random() < 0.15) {
+     const unlearned = recipeDrops.filter(r => !state.unlockedRecipes?.includes(r));
+     if (unlearned.length > 0) {
+        recipe = unlearned[Math.floor(Math.random() * unlearned.length)];
+     }
+  }
+
   return {
     isResource: true,
-    iron, soulDust, bone, resin, reagent, wood
+    iron, soulDust, bone, resin, reagent, wood,
+    recipe
   };
 }
 
@@ -140,6 +151,7 @@ export function generateLootHtml(item) {
     if (item.resin) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/resin.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Смола: +${item.resin}</span></div>`;
     if (item.reagent) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/reagent.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Реагент: +${item.reagent}</span></div>`;
     if (item.wood) html += `<div style="display:flex; align-items:center; gap:8px;"><img src="./assets/items/wood.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Древесина: +${item.wood}</span></div>`;
+    if (item.recipe) html += `<div style="display:flex; align-items:center; gap:8px; color: #ffeb3b;"><img src="./assets/items/scroll.png" style="width:32px; height:32px; border:1px solid #444; border-radius:4px;" onerror="this.style.display='none'"><span>Рецепт: ${slots.find(s => s.key === item.recipe)?.name || item.recipe}</span></div>`;
     html += `</div>`;
     return html;
   }
@@ -208,6 +220,10 @@ export function equipPendingLoot() {
     if (state.pendingLoot.resin) state.resources.resin = (state.resources.resin || 0) + state.pendingLoot.resin;
     if (state.pendingLoot.reagent) state.resources.reagent = (state.resources.reagent || 0) + state.pendingLoot.reagent;
     if (state.pendingLoot.wood) state.resources.wood = (state.resources.wood || 0) + state.pendingLoot.wood;
+    if (state.pendingLoot.recipe) {
+      if (!state.unlockedRecipes) state.unlockedRecipes = [];
+      if (!state.unlockedRecipes.includes(state.pendingLoot.recipe)) state.unlockedRecipes.push(state.pendingLoot.recipe);
+    }
     addLog(state, `Ресурсы собраны!`);
   } else {
     const old = state.inventory[state.pendingLoot.slot];
